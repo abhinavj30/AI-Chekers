@@ -1,6 +1,8 @@
 package client;
 
 
+import java.util.ArrayList;
+
 /**
  * Created by abhinav on 10/19/2017.
  * Basic board class
@@ -9,6 +11,8 @@ class Board {
 
 
     static Checker[][] boardPieces;
+    static ArrayList<CheckerLocation> blackPieceLocations;
+    static ArrayList<CheckerLocation> redPieceLocations;
 
     private final int EMPTY = 0;
     private final int BLACK = 1;
@@ -42,62 +46,83 @@ class Board {
 
     private void initializeBoard() {
 
-
+        blackPieceLocations = new ArrayList<>();
+        redPieceLocations = new ArrayList<>();
         for (int i = 0; i < 3; i++) {
             for (int j = i % 2; j < 8; j += 2) {
                 boardPieces[i][j].setPieceColor(BLACK);
+                blackPieceLocations.add(new CheckerLocation(i, j));
             }
         }
         for (int i = 5; i < 8; i++) {
             for (int j = (i + 1) % 2; j < 8; j += 2) {
                 boardPieces[i][j].setPieceColor(RED);
+                redPieceLocations.add(new CheckerLocation(i, j));
             }
         }
+        boardPieces[3][3].setPieceColor(RED);
+        redPieceLocations.add(new CheckerLocation(3, 3));
     }
 
-
-    private int moveChecker(int direction, int iOrig, int jOrig, int playerNum, boolean postKill, boolean justCheck) {
+    MoveLocation moveChecker(int direction, int iOrig, int jOrig, int playerNum, boolean postKill, boolean justCheck) {
         if (boardPieces[iOrig][jOrig].getPieceColor() == playerNum) {
             if (boardPieces[iOrig][jOrig].isKing() || boardPieces[iOrig][jOrig].getPieceColor() == ((direction % 10) % 3) + 1) {
                 int[] destCoords = {iOrig + (direction % 5) - 2, jOrig + (direction % 4) - 2};
                 for (int coord : destCoords) {
                     if (coord < 1 || coord > 7) {
-                        return NO_MOVE;
+                        return new MoveLocation(0, 0, NO_MOVE);
                     }
                 }
                 if (!postKill && boardPieces[destCoords[0]][destCoords[1]].getPieceColor() == EMPTY) {
                     if (!justCheck) {
-                        boardPieces[destCoords[0]][destCoords[1]].setPieceColor(boardPieces[iOrig][jOrig].getPieceColor());
-                        boardPieces[destCoords[0]][destCoords[1]].setKing(boardPieces[iOrig][jOrig].isKing());
-                        boardPieces[iOrig][jOrig] = new Checker();
+                        moveLocation(iOrig, jOrig, destCoords[0], destCoords[1]);
                     }
-                    return MOVE_BLANK;
+                    return new MoveLocation(destCoords[0], destCoords[1], MOVE_BLANK);
                 } else if (boardPieces[destCoords[0]][destCoords[1]].getPieceColor() == playerNum) {
-                    return NO_MOVE;
+                    return new MoveLocation(0, 0, NO_MOVE);
                 } else {
                     int[] killCoords = new int[2];
-                    killCoords[0] = destCoords[0] * 2;
-                    killCoords[1] = destCoords[1] * 2;
+                    killCoords[0] = iOrig + ((direction % 5) - 2) * 2;
+                    killCoords[1] = jOrig + ((direction % 4) - 2) * 2;
+                    System.out.println("Kills: " + killCoords[0]);
                     for (int coord : killCoords) {
                         if (coord < 1 || coord > 7) {
-                            return NO_MOVE;
+                            return new MoveLocation(0, 0, NO_MOVE);
                         }
                     }
                     if (boardPieces[killCoords[0]][killCoords[1]].getPieceColor() == EMPTY) {
                         if (!justCheck) {
-                            boardPieces[killCoords[0]][killCoords[1]].setPieceColor(boardPieces[iOrig][jOrig].getPieceColor());
-                            boardPieces[killCoords[0]][killCoords[1]].setKing(boardPieces[iOrig][jOrig].isKing());
-                            boardPieces[destCoords[0]][destCoords[1]] = new Checker();
-                            boardPieces[iOrig][jOrig] = new Checker();
+                            moveLocation(iOrig, jOrig, killCoords[0], killCoords[1]);
+                            removeChecker(destCoords[0], destCoords[1]);
                         }
-                        return MOVE_KILL;
+                        return new MoveLocation(killCoords[0], killCoords[1], MOVE_KILL);
                     } else {
-                        return NO_MOVE;
+                        return new MoveLocation(0, 0, NO_MOVE);
                     }
                 }
             }
         }
-        return NO_MOVE;
+        return new MoveLocation(0, 0, NO_MOVE);
     }
 
+    private void removeChecker(int iLoc, int jLoc) {
+        if (boardPieces[iLoc][jLoc].getPieceColor() == BLACK) {
+            blackPieceLocations.remove(new CheckerLocation(iLoc, jLoc));
+        } else {
+            redPieceLocations.remove(new CheckerLocation(iLoc, jLoc));
+        }
+        boardPieces[iLoc][jLoc] = new Checker();
+    }
+
+    private void moveLocation(int iOrig, int jOrig, int iDest, int jDest) {
+        boardPieces[iDest][jDest] = new Checker(boardPieces[iOrig][jOrig].getPieceColor(), boardPieces[iOrig][jOrig].isKing());
+        if (boardPieces[iOrig][jOrig].getPieceColor() == BLACK) {
+            blackPieceLocations.remove(new CheckerLocation(iOrig, jOrig));
+            blackPieceLocations.add(new CheckerLocation(iDest, jDest));
+        } else {
+            redPieceLocations.remove(new CheckerLocation(iOrig, jOrig));
+            redPieceLocations.add(new CheckerLocation(iDest, jDest));
+        }
+        boardPieces[iOrig][jOrig] = new Checker();
+    }
 }

@@ -21,11 +21,11 @@ public class Checker {
 
     private boolean isKing;
 
-    public boolean isKing() {
+    boolean isKing() {
         return isKing;
     }
 
-    public void setKing(boolean king) {
+    void setKing(boolean king) {
         isKing = king;
     }
 
@@ -37,5 +37,10 @@ public class Checker {
     Checker() {
         pieceColor = EMPTY;
         isKing = false;
+    }
+
+    Checker(int color, boolean king){
+        pieceColor = color;
+        isKing = king;
     }
 }
