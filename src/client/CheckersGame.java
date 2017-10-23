@@ -38,6 +38,8 @@ public class CheckersGame extends JPanel implements ActionListener, MouseListene
     private ArrayList<MoveLocation> validMoves;
 
     private static JFrame frame;
+    private static CheckerLocation selectedBlock;
+    private static int currentPlayer;
 
     public CheckersGame() {
         gameBoard = new Board();
@@ -48,11 +50,12 @@ public class CheckersGame extends JPanel implements ActionListener, MouseListene
     }
 
     public void startGame(boolean oneIsAI, boolean twoIsAI) {
-        int playerNum = BLACK;
+        currentPlayer = BLACK;
         System.out.println();
         while (redPieceLocations.size() != 0 && blackPieceLocations.size() != 0) {
             System.out.println("Color: " + boardPieces[2][0].getPieceColor());
-            checkValidMoves(2, 2, playerNum);
+            selectedBlock = new CheckerLocation(2, 4);
+            checkValidMoves();
             System.out.println("Test: " + validMoves);
             return;
             //Black plays first;
@@ -73,10 +76,10 @@ public class CheckersGame extends JPanel implements ActionListener, MouseListene
         frame.add(this);
     }
 
-    void checkValidMoves(int iOrig, int jOrig, int playerNum) {
+    void checkValidMoves() {
         validMoves = new ArrayList<>();
         for (int direc : moveDirections) {
-            validMoves.add(gameBoard.moveChecker(direc, iOrig, jOrig, playerNum, false, true));
+            validMoves.add(gameBoard.moveChecker(direc, selectedBlock.xLocation, selectedBlock.yLocation, currentPlayer, false, true));
         }
     }
 
@@ -92,18 +95,32 @@ public class CheckersGame extends JPanel implements ActionListener, MouseListene
                     g.fillRect(col * 720 / 8, row * 720 / 8, 720 / 8, 720 / 8);
                 }
             }
+            g.setColor(Color.blue);
+            g.fillRect(selectedBlock.yLocation*720/8, selectedBlock.xLocation*720/8, 720/8, 720/8);
             for (MoveLocation loc : validMoves) {
                 if (loc.moveType == MOVE_BLANK) {
                     g.setColor(Color.green);
                     g.fillRect(loc.yLocation * 720 / 8, loc.xLocation * 720 / 8, 720 / 8, 720 / 8);
-                }
-                else if (loc.moveType == MOVE_KILL){
+                } else if (loc.moveType == MOVE_KILL) {
                     g.setColor(Color.pink);
                     g.fillRect(loc.yLocation * 720 / 8, loc.xLocation * 720 / 8, 720 / 8, 720 / 8);
                 }
             }
+            for (CheckerLocation loc : blackPieceLocations) {
+                drawChecker(loc.yLocation, loc.xLocation, g, Color.black);
+            }
+            for (CheckerLocation loc : redPieceLocations){
+                drawChecker(loc.yLocation, loc.xLocation, g, Color.red);
+            }
         }
         System.out.println("Painting...");
+    }
+
+    public void drawChecker(int iLoc, int jLoc, Graphics g, Color color) {
+        ((Graphics2D) g).setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        ((Graphics2D) g).setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+        g.setColor(color);
+        g.fillOval((iLoc * 720 / 8) + 2, (jLoc * 720 / 8) + 2, 720 / 8 - 4, 720 / 8 - 4);
     }
 
     @Override
