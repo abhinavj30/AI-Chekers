@@ -10,27 +10,31 @@ public class Checker {
     private final int RED = 2;
 
     private int pieceColor;
+
     int getPieceColor() {
         return pieceColor;
     }
+
     void setPieceColor(int pieceColor) {
         this.pieceColor = pieceColor;
     }
 
     private boolean isKing;
+
     public boolean isKing() {
         return isKing;
     }
+
     public void setKing(boolean king) {
         isKing = king;
     }
 
-    public Checker(int color){
+    public Checker(int color) {
         pieceColor = color;
         isKing = false;
     }
 
-    Checker(){
+    Checker() {
         pieceColor = EMPTY;
         isKing = false;
     }

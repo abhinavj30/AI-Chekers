@@ -29,16 +29,16 @@ public class CheckersGame extends JPanel implements ActionListener, MouseListene
     private static int redScore = 12;
     private static int blackScore = 12;
 
-    public CheckersGame(){
+    public CheckersGame() {
         gameBoard = new Board();
         setupWindow();
     }
 
-    public void StartGame(boolean oneIsAI, boolean twoIsAI){
+    public void StartGame(boolean oneIsAI, boolean twoIsAI) {
 
     }
 
-    void setupWindow(){
+    void setupWindow() {
         JFrame frame = new JFrame();
         frame.setSize(720, 720);
         frame.setBackground(Color.white);
@@ -51,7 +51,7 @@ public class CheckersGame extends JPanel implements ActionListener, MouseListene
         frame.add(this);
     }
 
-    void startGame(int playerOne, int playerTwo){
+    void startGame(int playerOne, int playerTwo) {
 
     }
 
