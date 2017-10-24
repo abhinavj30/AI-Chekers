@@ -13,4 +13,18 @@ public class MoveLocation extends CheckerLocation {
         yLocation = yLoc;
         this.moveType = moveTypeIn;
     }
+
+    @Override
+    public boolean equals(Object obj){
+        if (obj instanceof MoveLocation) {
+            MoveLocation loc = (MoveLocation)obj;
+            if (xLocation == loc.xLocation && yLocation == loc.yLocation && moveType == loc.moveType) {
+                return true;
+            } else {
+                return false;
+            }
+        } else {
+            return false;
+        }
+    }
 }

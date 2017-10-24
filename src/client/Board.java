@@ -1,6 +1,7 @@
 package client;
 
 
+import java.net.ServerSocket;
 import java.util.ArrayList;
 
 /**
@@ -55,14 +56,11 @@ class Board {
             }
         }
         for (int i = 5; i < 8; i++) {
-            for (int j = (i + 1) % 2; j < 8; j += 2) {
+            for (int j = i % 2; j < 8; j += 2) {
                 boardPieces[i][j].setPieceColor(RED);
                 redPieceLocations.add(new CheckerLocation(i, j));
             }
         }
-        boardPieces[3][3].setPieceColor(RED);
-        boardPieces[2][2].setKing(true);
-        redPieceLocations.add(new CheckerLocation(3, 3));
     }
 
     MoveLocation moveChecker(int direction, int iOrig, int jOrig, int playerNum, boolean postKill, boolean justCheck) {
@@ -70,7 +68,7 @@ class Board {
             if (boardPieces[iOrig][jOrig].isKing() || boardPieces[iOrig][jOrig].getPieceColor() == ((direction % 10) % 3) + 1) {
                 int[] destCoords = {iOrig + (direction % 5) - 2, jOrig + (direction % 4) - 2};
                 for (int coord : destCoords) {
-                    if (coord < 1 || coord > 7) {
+                    if (coord < 0 || coord > 7) {
                         return new MoveLocation(0, 0, NO_MOVE);
                     }
                 }
@@ -86,7 +84,7 @@ class Board {
                     killCoords[0] = iOrig + ((direction % 5) - 2) * 2;
                     killCoords[1] = jOrig + ((direction % 4) - 2) * 2;
                     for (int coord : killCoords) {
-                        if (coord < 1 || coord > 7) {
+                        if (coord < 0 || coord > 7) {
                             return new MoveLocation(0, 0, NO_MOVE);
                         }
                     }

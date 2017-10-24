@@ -36,8 +36,8 @@ public class CheckersGame extends JPanel implements ActionListener, MouseListene
     private final int MOVE_UP_LEFT = 11;
 
     private static Board gameBoard;
-    private static int redScore = 12;
-    private static int blackScore = 12;
+    private static int redScore = 13;
+    private static int blackScore = 13;
 
     private static int[] moveDirections = {1, 3, 11, 13};
     private ArrayList<MoveLocation> validMoves;
@@ -89,6 +89,31 @@ public class CheckersGame extends JPanel implements ActionListener, MouseListene
         }
     }
 
+    private void makeMove(int moveType, int direction) {
+        if (gameBoard.moveChecker(direction, selectedBlock.xLocation, selectedBlock.yLocation, currentPlayer, false, false).moveType == MOVE_KILL) {
+            if (currentPlayer == BLACK) {
+                blackScore--;
+            } else {
+                redScore--;
+            }
+        }
+        System.out.println("Score: Black - " + blackScore + ", Red - " + redScore);
+        if (redScore * blackScore == 0){
+            System.out.println("Game Over");
+        }
+        changePlayer();
+    }
+
+    private void changePlayer() {
+        if (currentPlayer == BLACK) {
+            System.out.println("Red plays now");
+            currentPlayer = RED;
+        } else {
+            System.out.println("Black plays now");
+            currentPlayer = BLACK;
+        }
+    }
+
     public void paint(Graphics g) {
         super.paintComponent(g);
         for (int row = 0; row < 8; row++) {
@@ -118,7 +143,6 @@ public class CheckersGame extends JPanel implements ActionListener, MouseListene
                 } else {
                     drawChecker(loc.yLocation, loc.xLocation, g, Color.black);
                 }
-                drawChecker(loc.yLocation, loc.xLocation, g, Color.black);
             }
             for (CheckerLocation loc : redPieceLocations) {
                 if (boardPieces[loc.xLocation][loc.yLocation].isKing()) {
@@ -128,7 +152,6 @@ public class CheckersGame extends JPanel implements ActionListener, MouseListene
                 }
             }
         }
-        System.out.println("Painting...");
     }
 
     private void updateBoard() {
@@ -155,18 +178,17 @@ public class CheckersGame extends JPanel implements ActionListener, MouseListene
 
     @Override
     public void mousePressed(MouseEvent e) {
-        int selectedCol = (e.getX() - 12) / 90;
-        int selectedRow = (e.getY() - 56) / 90;
+        int selectedCol = (e.getX() - 8) / 90;
+        int selectedRow = (e.getY() - 30) / 90;
         System.out.println("Clicked: " + selectedRow + ", " + selectedCol);
         for (MoveLocation loc : validMoves) {
             if (loc.xLocation == selectedRow && loc.yLocation == selectedCol) {
-                System.out.println("Working 1");
                 int direction;
                 if (selectedBlock.xLocation - selectedRow > 0) {
                     if (selectedBlock.yLocation - selectedCol > 0) {
-                        direction = MOVE_UP_LEFT;
-                    } else {
                         direction = MOVE_UP_RIGHT;
+                    } else {
+                        direction = MOVE_UP_LEFT;
                     }
                 } else {
                     if (selectedBlock.yLocation - selectedCol > 0) {
@@ -175,14 +197,13 @@ public class CheckersGame extends JPanel implements ActionListener, MouseListene
                         direction = MOVE_DOWN_RIGHT;
                     }
                 }
-                System.out.println("Direction: " + direction);
-                gameBoard.moveChecker(direction, selectedBlock.xLocation, selectedBlock.yLocation, currentPlayer, false, false);
+                makeMove(1, direction);
+                selectedBlock = new CheckerLocation(selectedRow, selectedCol);
             }
         }
-        if (validMoves.contains(new MoveLocation(selectedRow, selectedCol, MOVE_BLANK))) {
-            System.out.println("Working 2");
+        if (boardPieces[selectedRow][selectedCol].getPieceColor() == currentPlayer){
+            selectedBlock = new CheckerLocation(selectedRow, selectedCol);
         }
-        selectedBlock = new CheckerLocation(selectedRow, selectedCol);
         updateBoard();
     }
 
