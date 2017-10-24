@@ -58,7 +58,7 @@ public class CheckersGame extends JPanel implements ActionListener, MouseListene
         frame.setSize(800, 800);
     }
 
-    public void startGame(boolean oneIsAI, boolean twoIsAI) {
+    private void startGame(boolean oneIsAI, boolean twoIsAI) {
         currentPlayer = BLACK;
         System.out.println();
         while (redPieceLocations.size() != 0 && blackPieceLocations.size() != 0) {
@@ -72,7 +72,7 @@ public class CheckersGame extends JPanel implements ActionListener, MouseListene
         }
     }
 
-    void setupWindow() {
+    private void setupWindow() {
         frame = new JFrame();
         frame.setSize(800, 800);
         frame.setBackground(Color.white);
@@ -136,30 +136,32 @@ public class CheckersGame extends JPanel implements ActionListener, MouseListene
                     g.fillRect(col * 720 / 8, row * 720 / 8, 720 / 8, 720 / 8);
                 }
             }
+        }
+        if (selectedBlock.yLocation > -1 && selectedBlock.xLocation > -1) {
             g.setColor(Color.blue);
             g.fillRect(selectedBlock.yLocation * 720 / 8, selectedBlock.xLocation * 720 / 8, 720 / 8, 720 / 8);
-            for (MoveLocation loc : validMoves) {
-                if (loc.moveType == MOVE_BLANK) {
-                    g.setColor(Color.green);
-                    g.fillRect(loc.yLocation * 720 / 8, loc.xLocation * 720 / 8, 720 / 8, 720 / 8);
-                } else if (loc.moveType == MOVE_KILL) {
-                    g.setColor(Color.pink);
-                    g.fillRect(loc.yLocation * 720 / 8, loc.xLocation * 720 / 8, 720 / 8, 720 / 8);
-                }
+        }
+        for (MoveLocation loc : validMoves) {
+            if (loc.moveType == MOVE_BLANK) {
+                g.setColor(Color.green);
+                g.fillRect(loc.yLocation * 720 / 8, loc.xLocation * 720 / 8, 720 / 8, 720 / 8);
+            } else if (loc.moveType == MOVE_KILL) {
+                g.setColor(Color.pink);
+                g.fillRect(loc.yLocation * 720 / 8, loc.xLocation * 720 / 8, 720 / 8, 720 / 8);
             }
-            for (CheckerLocation loc : blackPieceLocations) {
-                if (boardPieces[loc.xLocation][loc.yLocation].isKing()) {
-                    drawChecker(loc.yLocation, loc.xLocation, g, Color.darkGray);
-                } else {
-                    drawChecker(loc.yLocation, loc.xLocation, g, Color.black);
-                }
+        }
+        for (CheckerLocation loc : blackPieceLocations) {
+            if (boardPieces[loc.xLocation][loc.yLocation].isKing()) {
+                drawChecker(loc.yLocation, loc.xLocation, g, Color.darkGray);
+            } else {
+                drawChecker(loc.yLocation, loc.xLocation, g, Color.black);
             }
-            for (CheckerLocation loc : redPieceLocations) {
-                if (boardPieces[loc.xLocation][loc.yLocation].isKing()) {
-                    drawChecker(loc.yLocation, loc.xLocation, g, Color.magenta);
-                } else {
-                    drawChecker(loc.yLocation, loc.xLocation, g, Color.red);
-                }
+        }
+        for (CheckerLocation loc : redPieceLocations) {
+            if (boardPieces[loc.xLocation][loc.yLocation].isKing()) {
+                drawChecker(loc.yLocation, loc.xLocation, g, Color.magenta);
+            } else {
+                drawChecker(loc.yLocation, loc.xLocation, g, Color.red);
             }
         }
     }
@@ -169,11 +171,11 @@ public class CheckersGame extends JPanel implements ActionListener, MouseListene
         boolean moreKills = false;
         if (postKill) {
             for (MoveLocation loc : validMoves) {
-                if (loc.moveType == MOVE_KILL){
+                if (loc.moveType == MOVE_KILL) {
                     moreKills = true;
                 }
             }
-            if (!moreKills){
+            if (!moreKills) {
                 postKill = false;
                 changePlayer();
             }

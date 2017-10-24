@@ -72,11 +72,13 @@ class Board {
                         return new MoveLocation(-1, -1, NO_MOVE);
                     }
                 }
-                if (!postKill && boardPieces[destCoords[0]][destCoords[1]].getPieceColor() == EMPTY) {
-                    if (!justCheck) {
-                        moveLocation(iOrig, jOrig, destCoords[0], destCoords[1]);
+                if (boardPieces[destCoords[0]][destCoords[1]].getPieceColor() == EMPTY) {
+                    if (!postKill) {
+                        if (!justCheck) {
+                            moveLocation(iOrig, jOrig, destCoords[0], destCoords[1]);
+                        }
+                        return new MoveLocation(destCoords[0], destCoords[1], MOVE_BLANK);
                     }
-                    return new MoveLocation(destCoords[0], destCoords[1], MOVE_BLANK);
                 } else if (boardPieces[destCoords[0]][destCoords[1]].getPieceColor() == playerNum) {
                     return new MoveLocation(-1, -1, NO_MOVE);
                 } else {
@@ -100,7 +102,7 @@ class Board {
                 }
             }
         }
-        return new MoveLocation(0, 0, NO_MOVE);
+        return new MoveLocation(-1, -1, NO_MOVE);
     }
 
     private void removeChecker(int iLoc, int jLoc) {
@@ -121,7 +123,7 @@ class Board {
             redPieceLocations.remove(new CheckerLocation(iOrig, jOrig));
             redPieceLocations.add(new CheckerLocation(iDest, jDest));
         }
-        if (iDest == 0 || iDest == 7){
+        if (iDest == 0 || iDest == 7) {
             boardPieces[iDest][jDest].setKing(true);
         }
         boardPieces[iOrig][jOrig] = new Checker();
