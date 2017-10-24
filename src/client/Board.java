@@ -61,6 +61,7 @@ class Board {
             }
         }
         boardPieces[3][3].setPieceColor(RED);
+        boardPieces[2][2].setKing(true);
         redPieceLocations.add(new CheckerLocation(3, 3));
     }
 
@@ -84,7 +85,6 @@ class Board {
                     int[] killCoords = new int[2];
                     killCoords[0] = iOrig + ((direction % 5) - 2) * 2;
                     killCoords[1] = jOrig + ((direction % 4) - 2) * 2;
-                    System.out.println("Kills: " + killCoords[0]);
                     for (int coord : killCoords) {
                         if (coord < 1 || coord > 7) {
                             return new MoveLocation(0, 0, NO_MOVE);
@@ -122,6 +122,9 @@ class Board {
         } else {
             redPieceLocations.remove(new CheckerLocation(iOrig, jOrig));
             redPieceLocations.add(new CheckerLocation(iDest, jDest));
+        }
+        if (iDest == 0 || iDest == 7){
+            boardPieces[iDest][jDest].setKing(true);
         }
         boardPieces[iOrig][jOrig] = new Checker();
     }

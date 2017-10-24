@@ -30,6 +30,11 @@ public class CheckersGame extends JPanel implements ActionListener, MouseListene
     private final int MOVE_BLANK = 1;
     private final int MOVE_KILL = 2;
 
+    private final int MOVE_DOWN_RIGHT = 3;
+    private final int MOVE_DOWN_LEFT = 13;
+    private final int MOVE_UP_RIGHT = 1;
+    private final int MOVE_UP_LEFT = 11;
+
     private static Board gameBoard;
     private static int redScore = 12;
     private static int blackScore = 12;
@@ -40,6 +45,8 @@ public class CheckersGame extends JPanel implements ActionListener, MouseListene
     private static JFrame frame;
     private static CheckerLocation selectedBlock;
     private static int currentPlayer;
+
+    private static int gameStatus;
 
     public CheckersGame() {
         gameBoard = new Board();
@@ -56,7 +63,6 @@ public class CheckersGame extends JPanel implements ActionListener, MouseListene
             System.out.println("Color: " + boardPieces[2][0].getPieceColor());
             selectedBlock = new CheckerLocation(2, 4);
             checkValidMoves();
-            System.out.println("Test: " + validMoves);
             return;
             //Black plays first;
             //Wait for play
@@ -76,7 +82,7 @@ public class CheckersGame extends JPanel implements ActionListener, MouseListene
         frame.add(this);
     }
 
-    void checkValidMoves() {
+    private void checkValidMoves() {
         validMoves = new ArrayList<>();
         for (int direc : moveDirections) {
             validMoves.add(gameBoard.moveChecker(direc, selectedBlock.xLocation, selectedBlock.yLocation, currentPlayer, false, true));
@@ -96,7 +102,7 @@ public class CheckersGame extends JPanel implements ActionListener, MouseListene
                 }
             }
             g.setColor(Color.blue);
-            g.fillRect(selectedBlock.yLocation*720/8, selectedBlock.xLocation*720/8, 720/8, 720/8);
+            g.fillRect(selectedBlock.yLocation * 720 / 8, selectedBlock.xLocation * 720 / 8, 720 / 8, 720 / 8);
             for (MoveLocation loc : validMoves) {
                 if (loc.moveType == MOVE_BLANK) {
                     g.setColor(Color.green);
@@ -107,16 +113,30 @@ public class CheckersGame extends JPanel implements ActionListener, MouseListene
                 }
             }
             for (CheckerLocation loc : blackPieceLocations) {
+                if (boardPieces[loc.xLocation][loc.yLocation].isKing()) {
+                    drawChecker(loc.yLocation, loc.xLocation, g, Color.darkGray);
+                } else {
+                    drawChecker(loc.yLocation, loc.xLocation, g, Color.black);
+                }
                 drawChecker(loc.yLocation, loc.xLocation, g, Color.black);
             }
-            for (CheckerLocation loc : redPieceLocations){
-                drawChecker(loc.yLocation, loc.xLocation, g, Color.red);
+            for (CheckerLocation loc : redPieceLocations) {
+                if (boardPieces[loc.xLocation][loc.yLocation].isKing()) {
+                    drawChecker(loc.yLocation, loc.xLocation, g, Color.magenta);
+                } else {
+                    drawChecker(loc.yLocation, loc.xLocation, g, Color.red);
+                }
             }
         }
         System.out.println("Painting...");
     }
 
-    public void drawChecker(int iLoc, int jLoc, Graphics g, Color color) {
+    private void updateBoard() {
+        checkValidMoves();
+        repaint();
+    }
+
+    private void drawChecker(int iLoc, int jLoc, Graphics g, Color color) {
         ((Graphics2D) g).setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         ((Graphics2D) g).setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
         g.setColor(color);
@@ -135,7 +155,35 @@ public class CheckersGame extends JPanel implements ActionListener, MouseListene
 
     @Override
     public void mousePressed(MouseEvent e) {
-
+        int selectedCol = (e.getX() - 12) / 90;
+        int selectedRow = (e.getY() - 56) / 90;
+        System.out.println("Clicked: " + selectedRow + ", " + selectedCol);
+        for (MoveLocation loc : validMoves) {
+            if (loc.xLocation == selectedRow && loc.yLocation == selectedCol) {
+                System.out.println("Working 1");
+                int direction;
+                if (selectedBlock.xLocation - selectedRow > 0) {
+                    if (selectedBlock.yLocation - selectedCol > 0) {
+                        direction = MOVE_UP_LEFT;
+                    } else {
+                        direction = MOVE_UP_RIGHT;
+                    }
+                } else {
+                    if (selectedBlock.yLocation - selectedCol > 0) {
+                        direction = MOVE_DOWN_LEFT;
+                    } else {
+                        direction = MOVE_DOWN_RIGHT;
+                    }
+                }
+                System.out.println("Direction: " + direction);
+                gameBoard.moveChecker(direction, selectedBlock.xLocation, selectedBlock.yLocation, currentPlayer, false, false);
+            }
+        }
+        if (validMoves.contains(new MoveLocation(selectedRow, selectedCol, MOVE_BLANK))) {
+            System.out.println("Working 2");
+        }
+        selectedBlock = new CheckerLocation(selectedRow, selectedCol);
+        updateBoard();
     }
 
     @Override
