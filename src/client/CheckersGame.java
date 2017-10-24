@@ -36,8 +36,8 @@ public class CheckersGame extends JPanel implements ActionListener, MouseListene
     private final int MOVE_UP_LEFT = 11;
 
     private static Board gameBoard;
-    private static int redScore = 13;
-    private static int blackScore = 13;
+    private static int redScore = 12;
+    private static int blackScore = 12;
 
     private static int[] moveDirections = {1, 3, 11, 13};
     private ArrayList<MoveLocation> validMoves;
