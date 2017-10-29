@@ -1,7 +1,6 @@
 package client;
 
 
-import java.net.ServerSocket;
 import java.util.ArrayList;
 
 /**
@@ -63,46 +62,62 @@ class Board {
         }
     }
 
-    MoveLocation moveChecker(int direction, int iOrig, int jOrig, int playerNum, boolean postKill, boolean justCheck) {
+    MoveLocation checkMove(int direction, int iOrig, int jOrig, int playerNum, boolean postKill, boolean justCheck) {
         if (boardPieces[iOrig][jOrig].getPieceColor() == playerNum) {
             if (boardPieces[iOrig][jOrig].isKing() || boardPieces[iOrig][jOrig].getPieceColor() == ((direction % 10) % 3) + 1) {
                 int[] destCoords = {iOrig + (direction % 5) - 2, jOrig + (direction % 4) - 2};
                 for (int coord : destCoords) {
                     if (coord < 0 || coord > 7) {
-                        return new MoveLocation(-1, -1, NO_MOVE);
+                        //return null;
+                        return new MoveLocation(iOrig, jOrig, -1, -1, NO_MOVE, 0, 0, false);
                     }
                 }
                 if (boardPieces[destCoords[0]][destCoords[1]].getPieceColor() == EMPTY) {
                     if (!postKill) {
                         if (!justCheck) {
-                            moveLocation(iOrig, jOrig, destCoords[0], destCoords[1]);
+                            movePiece(iOrig, jOrig, destCoords[0], destCoords[1]);
                         }
-                        return new MoveLocation(destCoords[0], destCoords[1], MOVE_BLANK);
+                        return new MoveLocation(iOrig, jOrig, destCoords[0], destCoords[1], MOVE_BLANK, 0, 0, false);
                     }
                 } else if (boardPieces[destCoords[0]][destCoords[1]].getPieceColor() == playerNum) {
-                    return new MoveLocation(-1, -1, NO_MOVE);
+                    return new MoveLocation(iOrig, jOrig, -1, -1, NO_MOVE, 0, 0, false);
                 } else {
                     int[] killCoords = new int[2];
                     killCoords[0] = iOrig + ((direction % 5) - 2) * 2;
                     killCoords[1] = jOrig + ((direction % 4) - 2) * 2;
                     for (int coord : killCoords) {
                         if (coord < 0 || coord > 7) {
-                            return new MoveLocation(-1, -1, NO_MOVE);
+                            return new MoveLocation(iOrig, jOrig, -1, -1, NO_MOVE, 0, 0, false);
                         }
                     }
                     if (boardPieces[killCoords[0]][killCoords[1]].getPieceColor() == EMPTY) {
                         if (!justCheck) {
-                            moveLocation(iOrig, jOrig, killCoords[0], killCoords[1]);
+                            movePiece(iOrig, jOrig, killCoords[0], killCoords[1]);
                             removeChecker(destCoords[0], destCoords[1]);
                         }
-                        return new MoveLocation(killCoords[0], killCoords[1], MOVE_KILL);
+                        return new MoveLocation(iOrig, jOrig, killCoords[0], killCoords[1], MOVE_KILL, 0, 0, false);
                     } else {
-                        return new MoveLocation(-1, -1, NO_MOVE);
+                        return new MoveLocation(iOrig, jOrig, -1, -1, NO_MOVE, 0, 0, false);
                     }
                 }
             }
         }
-        return new MoveLocation(-1, -1, NO_MOVE);
+        return new MoveLocation(iOrig, jOrig, -1, -1, NO_MOVE, 0, 0, false);
+    }
+
+    int pieceMover(MoveLocation moveLoc) {
+        if (moveLoc.moveType == MOVE_BLANK) {
+            this.movePiece(moveLoc.xSource, moveLoc.ySource, moveLoc.xDestination, moveLoc.yDestination);
+        } else {
+            this.movePiece(moveLoc.xSource, moveLoc.ySource, moveLoc.xDestination, moveLoc.yDestination);
+            this.removeChecker((moveLoc.xSource + moveLoc.xDestination) / 2, (moveLoc.ySource + moveLoc.yDestination) / 2);
+            if (moveLoc.isTerminal()) {
+                return 2;
+            } else {
+                return 1;
+            }
+        }
+        return 0;
     }
 
     private void removeChecker(int iLoc, int jLoc) {
@@ -114,7 +129,7 @@ class Board {
         boardPieces[iLoc][jLoc] = new Checker();
     }
 
-    private void moveLocation(int iOrig, int jOrig, int iDest, int jDest) {
+    private void movePiece(int iOrig, int jOrig, int iDest, int jDest) {
         boardPieces[iDest][jDest] = new Checker(boardPieces[iOrig][jOrig].getPieceColor(), boardPieces[iOrig][jOrig].isKing());
         if (boardPieces[iOrig][jOrig].getPieceColor() == BLACK) {
             blackPieceLocations.remove(new CheckerLocation(iOrig, jOrig));
