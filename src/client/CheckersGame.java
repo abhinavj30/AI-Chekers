@@ -60,6 +60,9 @@ public class CheckersGame extends JPanel implements ActionListener, MouseListene
     private void startGame(boolean oneIsAI, boolean twoIsAI) {
         currentPlayer = BLACK;
         System.out.println();
+        selectedBlock = new CheckerLocation(2, 2);
+        checkValidMoves();
+        /*
         while (redPieceLocations.size() != 0 && blackPieceLocations.size() != 0) {
             System.out.println("Color: " + boardPieces[2][0].getPieceColor());
             selectedBlock = new CheckerLocation(2, 4);
@@ -68,7 +71,7 @@ public class CheckersGame extends JPanel implements ActionListener, MouseListene
             //Black plays first;
             //Wait for play
 
-        }
+        }*/
     }
 
     private void setupWindow() {

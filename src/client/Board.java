@@ -63,42 +63,40 @@ class Board {
     }
 
     MoveLocation checkMove(int direction, int iOrig, int jOrig, int playerNum, boolean postKill, boolean justCheck) {
-        if (boardPieces[iOrig][jOrig].getPieceColor() == playerNum) {
-            if (boardPieces[iOrig][jOrig].isKing() || boardPieces[iOrig][jOrig].getPieceColor() == ((direction % 10) % 3) + 1) {
-                int[] destCoords = {iOrig + (direction % 5) - 2, jOrig + (direction % 4) - 2};
-                for (int coord : destCoords) {
+        if (boardPieces[iOrig][jOrig].isKing() || boardPieces[iOrig][jOrig].getPieceColor() == ((direction % 10) % 3) + 1) {
+            int[] destCoords = {iOrig + (direction % 5) - 2, jOrig + (direction % 4) - 2};
+            for (int coord : destCoords) {
+                if (coord < 0 || coord > 7) {
+                    //return null;
+                    return new MoveLocation(iOrig, jOrig, -1, -1, NO_MOVE, 0, 0, false);
+                }
+            }
+            if (boardPieces[destCoords[0]][destCoords[1]].getPieceColor() == EMPTY) {
+                if (!postKill) {
+                    if (!justCheck) {
+                        movePiece(iOrig, jOrig, destCoords[0], destCoords[1]);
+                    }
+                    return new MoveLocation(iOrig, jOrig, destCoords[0], destCoords[1], MOVE_BLANK, 0, 0, false);
+                }
+            } else if (boardPieces[destCoords[0]][destCoords[1]].getPieceColor() == playerNum) {
+                return new MoveLocation(iOrig, jOrig, -1, -1, NO_MOVE, 0, 0, false);
+            } else {
+                int[] killCoords = new int[2];
+                killCoords[0] = iOrig + ((direction % 5) - 2) * 2;
+                killCoords[1] = jOrig + ((direction % 4) - 2) * 2;
+                for (int coord : killCoords) {
                     if (coord < 0 || coord > 7) {
-                        //return null;
                         return new MoveLocation(iOrig, jOrig, -1, -1, NO_MOVE, 0, 0, false);
                     }
                 }
-                if (boardPieces[destCoords[0]][destCoords[1]].getPieceColor() == EMPTY) {
-                    if (!postKill) {
-                        if (!justCheck) {
-                            movePiece(iOrig, jOrig, destCoords[0], destCoords[1]);
-                        }
-                        return new MoveLocation(iOrig, jOrig, destCoords[0], destCoords[1], MOVE_BLANK, 0, 0, false);
+                if (boardPieces[killCoords[0]][killCoords[1]].getPieceColor() == EMPTY) {
+                    if (!justCheck) {
+                        movePiece(iOrig, jOrig, killCoords[0], killCoords[1]);
+                        removeChecker(destCoords[0], destCoords[1]);
                     }
-                } else if (boardPieces[destCoords[0]][destCoords[1]].getPieceColor() == playerNum) {
-                    return new MoveLocation(iOrig, jOrig, -1, -1, NO_MOVE, 0, 0, false);
+                    return new MoveLocation(iOrig, jOrig, killCoords[0], killCoords[1], MOVE_KILL, 0, 0, false);
                 } else {
-                    int[] killCoords = new int[2];
-                    killCoords[0] = iOrig + ((direction % 5) - 2) * 2;
-                    killCoords[1] = jOrig + ((direction % 4) - 2) * 2;
-                    for (int coord : killCoords) {
-                        if (coord < 0 || coord > 7) {
-                            return new MoveLocation(iOrig, jOrig, -1, -1, NO_MOVE, 0, 0, false);
-                        }
-                    }
-                    if (boardPieces[killCoords[0]][killCoords[1]].getPieceColor() == EMPTY) {
-                        if (!justCheck) {
-                            movePiece(iOrig, jOrig, killCoords[0], killCoords[1]);
-                            removeChecker(destCoords[0], destCoords[1]);
-                        }
-                        return new MoveLocation(iOrig, jOrig, killCoords[0], killCoords[1], MOVE_KILL, 0, 0, false);
-                    } else {
-                        return new MoveLocation(iOrig, jOrig, -1, -1, NO_MOVE, 0, 0, false);
-                    }
+                    return new MoveLocation(iOrig, jOrig, -1, -1, NO_MOVE, 0, 0, false);
                 }
             }
         }
