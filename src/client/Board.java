@@ -68,7 +68,7 @@ class Board {
             for (int coord : destCoords) {
                 if (coord < 0 || coord > 7) {
                     //return null;
-                    return new MoveLocation(iOrig, jOrig, -1, -1, NO_MOVE, 0, 0, false);
+                    return new MoveLocation(iOrig, jOrig, -1, -1, NO_MOVE);
                 }
             }
             if (boardPieces[destCoords[0]][destCoords[1]].getPieceColor() == EMPTY) {
@@ -76,17 +76,17 @@ class Board {
                     if (!justCheck) {
                         movePiece(iOrig, jOrig, destCoords[0], destCoords[1]);
                     }
-                    return new MoveLocation(iOrig, jOrig, destCoords[0], destCoords[1], MOVE_BLANK, 0, 0, false);
+                    return new MoveLocation(iOrig, jOrig, destCoords[0], destCoords[1], MOVE_BLANK);
                 }
             } else if (boardPieces[destCoords[0]][destCoords[1]].getPieceColor() == playerNum) {
-                return new MoveLocation(iOrig, jOrig, -1, -1, NO_MOVE, 0, 0, false);
+                return new MoveLocation(iOrig, jOrig, -1, -1, NO_MOVE);
             } else {
                 int[] killCoords = new int[2];
                 killCoords[0] = iOrig + ((direction % 5) - 2) * 2;
                 killCoords[1] = jOrig + ((direction % 4) - 2) * 2;
                 for (int coord : killCoords) {
                     if (coord < 0 || coord > 7) {
-                        return new MoveLocation(iOrig, jOrig, -1, -1, NO_MOVE, 0, 0, false);
+                        return new MoveLocation(iOrig, jOrig, -1, -1, NO_MOVE);
                     }
                 }
                 if (boardPieces[killCoords[0]][killCoords[1]].getPieceColor() == EMPTY) {
@@ -94,13 +94,13 @@ class Board {
                         movePiece(iOrig, jOrig, killCoords[0], killCoords[1]);
                         removeChecker(destCoords[0], destCoords[1]);
                     }
-                    return new MoveLocation(iOrig, jOrig, killCoords[0], killCoords[1], MOVE_KILL, 0, 0, false);
+                    return new MoveLocation(iOrig, jOrig, killCoords[0], killCoords[1], MOVE_KILL);
                 } else {
-                    return new MoveLocation(iOrig, jOrig, -1, -1, NO_MOVE, 0, 0, false);
+                    return new MoveLocation(iOrig, jOrig, -1, -1, NO_MOVE);
                 }
             }
         }
-        return new MoveLocation(iOrig, jOrig, -1, -1, NO_MOVE, 0, 0, false);
+        return new MoveLocation(iOrig, jOrig, -1, -1, NO_MOVE);
     }
 
     int pieceMover(MoveLocation moveLoc) {
@@ -109,11 +109,7 @@ class Board {
         } else {
             this.movePiece(moveLoc.xSource, moveLoc.ySource, moveLoc.xDestination, moveLoc.yDestination);
             this.removeChecker((moveLoc.xSource + moveLoc.xDestination) / 2, (moveLoc.ySource + moveLoc.yDestination) / 2);
-            if (moveLoc.isTerminal()) {
-                return 2;
-            } else {
-                return 1;
-            }
+            return 1;
         }
         return 0;
     }

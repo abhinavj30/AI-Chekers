@@ -23,11 +23,8 @@ public class CheckerLocation {
             CheckerLocation loc = (CheckerLocation)obj;
             if (xLocation == loc.xLocation && yLocation == loc.yLocation) {
                 return true;
-            } else {
-                return false;
             }
-        } else {
-            return false;
         }
+        return false;
     }
 }

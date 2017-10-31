@@ -1,5 +1,8 @@
 package client;
 
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+
 public class MoveLocation {
 
     private final int NO_MOVE = 0;
@@ -11,28 +14,27 @@ public class MoveLocation {
     final int ySource;
     final int xDestination;
     final int yDestination;
-    final int identifier;
-    final int moveNumber;
+    ArrayList<CheckerLocation> jumps;
+    int numMoves;
 
-    boolean isTerminal() {
-        return isTerminal;
-    }
-
-    void setTerminal(boolean terminal) {
-        isTerminal = terminal;
-    }
-
-    private boolean isTerminal;
-
-    MoveLocation(int xLoc, int yLoc, int xDest, int yDest, int moveTypeIn, int id, int moveNum, boolean terminal) {
+    MoveLocation(int xLoc, int yLoc, int xDest, int yDest, int moveTypeIn) {
         xSource = xLoc;
         ySource = yLoc;
         xDestination = xDest;
         yDestination = yDest;
         this.moveType = moveTypeIn;
-        identifier = id;
-        moveNumber = moveNum;
-        isTerminal = terminal;
+        jumps = new ArrayList<>();
+        numMoves = 0;
+    }
+
+    MoveLocation(MoveLocation loc){
+        this.moveType = loc.moveType;
+        this.xSource = loc.xSource;
+        this.ySource = loc.ySource;
+        this.xDestination = loc.xDestination;
+        this.yDestination = loc.yDestination;
+        this.jumps = loc.jumps;
+        this.numMoves = loc.numMoves;
     }
 
     @Override
@@ -40,8 +42,7 @@ public class MoveLocation {
         if (obj instanceof MoveLocation) {
             MoveLocation loc = (MoveLocation) obj;
             if (xSource == loc.xSource && ySource == loc.ySource && xDestination == loc.xDestination &&
-                    yDestination == loc.yDestination && moveType == loc.moveType && identifier == loc.identifier &&
-                    moveNumber == loc.moveNumber && isTerminal == loc.isTerminal) {
+                    yDestination == loc.yDestination && moveType == loc.moveType) {
                 return true;
             }
         }
