@@ -1,6 +1,7 @@
 package client;
 
 
+import javax.net.ssl.SSLContext;
 import java.util.ArrayList;
 
 /**
@@ -24,8 +25,10 @@ class Board {
 
     private final int MOVE_DOWN_RIGHT = 3;
     private final int MOVE_DOWN_LEFT = 13;
-    private final int MOVE_UP_RIGHT = 1;
-    private final int MOVE_UP_LEFT = 11;
+    private final int MOVE_UP_RIGHT = 11;
+    private final int MOVE_UP_LEFT = 1;
+
+    private static int[] moveDirections = {1, 3, 11, 13};
 
     Board() {
         boardPieces = new Checker[8][8];
@@ -63,12 +66,11 @@ class Board {
     }
 
     MoveLocation checkMove(int direction, int iOrig, int jOrig, int playerNum, boolean postKill, boolean justCheck) {
-        if (boardPieces[iOrig][jOrig].isKing() || boardPieces[iOrig][jOrig].getPieceColor() == ((direction % 10) % 3) + 1) {
+//        if (boardPieces[iOrig][jOrig].isKing() || boardPieces[iOrig][jOrig].getPieceColor() == ((direction % 10) % 3) + 1) {
             int[] destCoords = {iOrig + (direction % 5) - 2, jOrig + (direction % 4) - 2};
             for (int coord : destCoords) {
                 if (coord < 0 || coord > 7) {
-                    //return null;
-                    return new MoveLocation(iOrig, jOrig, -1, -1, NO_MOVE);
+                    return null;
                 }
             }
             if (boardPieces[destCoords[0]][destCoords[1]].getPieceColor() == EMPTY) {
@@ -79,14 +81,14 @@ class Board {
                     return new MoveLocation(iOrig, jOrig, destCoords[0], destCoords[1], MOVE_BLANK);
                 }
             } else if (boardPieces[destCoords[0]][destCoords[1]].getPieceColor() == playerNum) {
-                return new MoveLocation(iOrig, jOrig, -1, -1, NO_MOVE);
+                return null;
             } else {
                 int[] killCoords = new int[2];
                 killCoords[0] = iOrig + ((direction % 5) - 2) * 2;
                 killCoords[1] = jOrig + ((direction % 4) - 2) * 2;
                 for (int coord : killCoords) {
                     if (coord < 0 || coord > 7) {
-                        return new MoveLocation(iOrig, jOrig, -1, -1, NO_MOVE);
+                        return null;
                     }
                 }
                 if (boardPieces[killCoords[0]][killCoords[1]].getPieceColor() == EMPTY) {
@@ -96,11 +98,11 @@ class Board {
                     }
                     return new MoveLocation(iOrig, jOrig, killCoords[0], killCoords[1], MOVE_KILL);
                 } else {
-                    return new MoveLocation(iOrig, jOrig, -1, -1, NO_MOVE);
+                    return null;
                 }
             }
-        }
-        return new MoveLocation(iOrig, jOrig, -1, -1, NO_MOVE);
+//        }
+        return null;
     }
 
     int pieceMover(MoveLocation moveLoc) {

@@ -22,7 +22,7 @@ public class MoveLocation {
         ySource = yLoc;
         xDestination = xDest;
         yDestination = yDest;
-        this.moveType = moveTypeIn;
+        moveType = moveTypeIn;
         jumps = new ArrayList<>();
         numMoves = 0;
     }

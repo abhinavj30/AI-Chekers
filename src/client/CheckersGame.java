@@ -30,8 +30,8 @@ public class CheckersGame extends JPanel implements ActionListener, MouseListene
 
     private final int MOVE_DOWN_RIGHT = 3;
     private final int MOVE_DOWN_LEFT = 13;
-    private final int MOVE_UP_RIGHT = 1;
-    private final int MOVE_UP_LEFT = 11;
+    private final int MOVE_UP_RIGHT = 11;
+    private final int MOVE_UP_LEFT = 1;
 
     private static Board gameBoard;
     private static int redScore = 12;
@@ -97,6 +97,7 @@ public class CheckersGame extends JPanel implements ActionListener, MouseListene
         }
         int id = 1;
         for (CheckerLocation loc : currentCheckers) {
+            checkSquareMoves(loc, false, 0, null);
             for (int direc : moveDirections) {
                 MoveLocation validMove = gameBoard.checkMove(direc, loc.xLocation, loc.yLocation, currentPlayer, postKill, true);
                 if (validMove != null) {
@@ -110,23 +111,50 @@ public class CheckersGame extends JPanel implements ActionListener, MouseListene
         }
     }
 
-    private void checkSquareMoves(CheckerLocation location, boolean continueKill, int prevDirection, int IDin) {
-        ArrayList<MoveLocation> squareMoves = new ArrayList<>();
+    private void checkSquareMoves(CheckerLocation location, boolean continueKill, int prevDirection, MoveLocation moveIn) {
+        boolean noMoreJumps = true;
         for (int direc : moveDirections){
-            MoveLocation squareMove = gameBoard.checkMove(direc, location.xLocation, location.yLocation, currentPlayer, continueKill, true);
-            if (squareMove != null && continueKill && direc != getOppositeDirection(prevDirection)){
-                squareMoves.add(squareMove);
+            if (!continueKill || direc != getOppositeDirection(prevDirection)){
+            MoveLocation move = gameBoard.checkMove(direc, location.xLocation, location.yLocation, currentPlayer, continueKill, true);
+                if (move != null){
+                    if (move.moveType == MOVE_KILL){
+                        MoveLocation moveOut;
+                        if (!continueKill){
+                            moveOut = move;
+                        } else {
+                            moveOut = new MoveLocation(moveIn);
+                        }
+                        moveOut.jumps.add(new CheckerLocation(move.xDestination, move.yDestination));
+                        checkSquareMoves(new CheckerLocation(move.xDestination, move.yDestination), true, direc, moveOut);
+                        noMoreJumps = false;
+                    } else {
+                        move.jumps.add(new CheckerLocation(move.xDestination, move.yDestination));
+                        System.out.print("Move: " + move.xSource + "," + move.ySource);
+                        for (CheckerLocation loc : move.jumps){
+                            System.out.println(" - " + loc.xLocation + "," + loc.yLocation);
+                        }
+                        //validMoves.add(move);
+                    }
+                }
             }
+        }
+        if (noMoreJumps && continueKill){
+            System.out.print("Move: " + moveIn.xSource + "," + moveIn.ySource);
+            for (CheckerLocation loc : moveIn.jumps){
+                System.out.print(" - " + loc.xLocation + "," + loc.yLocation);
+            }
+            System.out.println();
+            //validMoves.add(moveIn);
         }
     }
 
     private int getOppositeDirection (int direction){
         int oppDirec = 1;
-        if (!((direction - 10) > 0)){
-            oppDirec = oppDirec + 10;
+        if (direction > 10){
+            oppDirec += 10;
         }
-        if (direction%10 == 1){
-            oppDirec = oppDirec + 2;
+        if (direction % 10 == 1){
+            oppDirec += 2;
         }
         return oppDirec;
     }
@@ -182,7 +210,7 @@ public class CheckersGame extends JPanel implements ActionListener, MouseListene
             g.fillRect(selectedBlock.yLocation * 720 / 8, selectedBlock.xLocation * 720 / 8, 720 / 8, 720 / 8);
         }
         for (MoveLocation loc : validMoves) {
-            System.out.println("Move: " + loc.xSource + ", " + loc.ySource + ", " + loc.xDestination + ", " + loc.yDestination + ", " + loc.moveType);
+            //System.out.println("Move: " + loc.xSource + ", " + loc.ySource + ", " + loc.xDestination + ", " + loc.yDestination + ", " + loc.moveType);
             if (!killAvailable && loc.moveType == MOVE_BLANK && loc.xSource == selectedBlock.xLocation && loc.ySource == selectedBlock.yLocation) {
                 g.setColor(Color.green);
                 g.fillRect(loc.yDestination * 720 / 8, loc.xDestination * 720 / 8, 720 / 8, 720 / 8);
@@ -253,9 +281,9 @@ public class CheckersGame extends JPanel implements ActionListener, MouseListene
                     int direction;
                     if (selectedBlock.xLocation - selectedRow > 0) {
                         if (selectedBlock.yLocation - selectedCol > 0) {
-                            direction = MOVE_UP_RIGHT;
-                        } else {
                             direction = MOVE_UP_LEFT;
+                        } else {
+                            direction = MOVE_UP_RIGHT;
                         }
                     } else {
                         if (selectedBlock.yLocation - selectedCol > 0) {
