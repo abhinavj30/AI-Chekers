@@ -63,7 +63,7 @@ class Board {
         }
     }
 
-    MoveLocation checkMove(int direction, int iOrig, int jOrig, int playerNum, boolean king, boolean postKill, boolean justCheck) {
+    MoveLocation checkMove(int direction, int iOrig, int jOrig, int playerNum, boolean king, boolean postKill) {
         if (boardPieces[iOrig][jOrig].isKing() || playerNum == ((direction % 10) % 3) + 1) {
             int[] destCoords = {iOrig + (direction % 5) - 2, jOrig + (direction % 4) - 2};
             for (int coord : destCoords) {
@@ -73,9 +73,6 @@ class Board {
             }
             if (boardPieces[destCoords[0]][destCoords[1]].getPieceColor() == EMPTY) {
                 if (!postKill) {
-                    if (!justCheck) {
-                        movePiece(iOrig, jOrig, destCoords[0], destCoords[1]);
-                    }
                     return new MoveLocation(iOrig, jOrig, destCoords[0], destCoords[1], MOVE_BLANK);
                 }
             } else if (boardPieces[destCoords[0]][destCoords[1]].getPieceColor() == playerNum) {
@@ -90,10 +87,6 @@ class Board {
                     }
                 }
                 if (boardPieces[killCoords[0]][killCoords[1]].getPieceColor() == EMPTY) {
-                    if (!justCheck) {
-                        movePiece(iOrig, jOrig, killCoords[0], killCoords[1]);
-                        removeChecker(destCoords[0], destCoords[1]);
-                    }
                     return new MoveLocation(iOrig, jOrig, killCoords[0], killCoords[1], MOVE_KILL);
                 } else {
                     return null;
@@ -107,8 +100,18 @@ class Board {
         if (moveLoc.moveType == MOVE_BLANK) {
             this.movePiece(moveLoc.xSource, moveLoc.ySource, moveLoc.xDestination, moveLoc.yDestination);
         } else {
-            this.movePiece(moveLoc.xSource, moveLoc.ySource, moveLoc.xDestination, moveLoc.yDestination);
-            this.removeChecker((moveLoc.xSource + moveLoc.xDestination) / 2, (moveLoc.ySource + moveLoc.yDestination) / 2);
+            CheckerLocation dest;
+            CheckerLocation source;
+            for (int i = 0; i < moveLoc.jumps.size(); i++){
+                dest = moveLoc.jumps.get(i);
+                if (i == 0){
+                    source = new CheckerLocation(moveLoc.xSource, moveLoc.ySource);
+                } else {
+                    source = moveLoc.jumps.get(i - 1);
+                }
+                this.movePiece(source.xLocation, source.yLocation, dest.xLocation, dest.yLocation);
+                this.removeChecker((source.xLocation + dest.xLocation) / 2, (source.yLocation + dest.yLocation) / 2);
+            }
             return 1;
         }
         return 0;
