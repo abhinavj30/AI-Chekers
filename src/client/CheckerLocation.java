@@ -1,7 +1,5 @@
 package client;
 
-import com.sun.org.apache.xpath.internal.operations.Equals;
-
 public class CheckerLocation {
 
     int xLocation;

@@ -1,7 +1,5 @@
 package client;
 
-
-import javax.net.ssl.SSLContext;
 import java.util.ArrayList;
 
 /**
@@ -65,8 +63,8 @@ class Board {
         }
     }
 
-    MoveLocation checkMove(int direction, int iOrig, int jOrig, int playerNum, boolean postKill, boolean justCheck) {
-//        if (boardPieces[iOrig][jOrig].isKing() || boardPieces[iOrig][jOrig].getPieceColor() == ((direction % 10) % 3) + 1) {
+    MoveLocation checkMove(int direction, int iOrig, int jOrig, int playerNum, boolean king, boolean postKill, boolean justCheck) {
+        if (boardPieces[iOrig][jOrig].isKing() || playerNum == ((direction % 10) % 3) + 1) {
             int[] destCoords = {iOrig + (direction % 5) - 2, jOrig + (direction % 4) - 2};
             for (int coord : destCoords) {
                 if (coord < 0 || coord > 7) {
@@ -101,7 +99,7 @@ class Board {
                     return null;
                 }
             }
-//        }
+        }
         return null;
     }
 

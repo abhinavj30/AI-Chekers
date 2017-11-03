@@ -1,6 +1,5 @@
 package client;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 public class MoveLocation {
@@ -15,7 +14,6 @@ public class MoveLocation {
     final int xDestination;
     final int yDestination;
     ArrayList<CheckerLocation> jumps;
-    int numMoves;
 
     MoveLocation(int xLoc, int yLoc, int xDest, int yDest, int moveTypeIn) {
         xSource = xLoc;
@@ -24,7 +22,6 @@ public class MoveLocation {
         yDestination = yDest;
         moveType = moveTypeIn;
         jumps = new ArrayList<>();
-        numMoves = 0;
     }
 
     MoveLocation(MoveLocation loc){
@@ -34,7 +31,6 @@ public class MoveLocation {
         this.xDestination = loc.xDestination;
         this.yDestination = loc.yDestination;
         this.jumps = loc.jumps;
-        this.numMoves = loc.numMoves;
     }
 
     @Override
