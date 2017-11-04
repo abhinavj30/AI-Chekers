@@ -38,7 +38,7 @@ public class CheckersGame extends JPanel implements ActionListener, MouseListene
     private static int blackScore = 12;
 
     private static int[] moveDirections = {1, 3, 11, 13};
-    private ArrayList<MoveLocation> validMoves;
+    public static ArrayList<MoveLocation> validMoves;
 
     private static JFrame frame;
     private static CheckerLocation selectedBlock;
@@ -96,21 +96,21 @@ public class CheckersGame extends JPanel implements ActionListener, MouseListene
             currentCheckers = redPieceLocations;
         }
         for (CheckerLocation loc : currentCheckers) {
-            checkSquareMoves(loc, false, 0, null, currentPlayer, boardPieces[loc.xLocation][loc.yLocation].isKing());
+            checkSquareMoves(loc, false, 0, null, currentPlayer, boardPieces[loc.xLocation][loc.yLocation].isKing(), validMoves);
         }
         if (killAvailable) {
             System.out.println("Kill available...");
             Iterator<MoveLocation> iter = validMoves.iterator();
-            while (iter.hasNext()){
+            while (iter.hasNext()) {
                 MoveLocation move = iter.next();
-                if (move.moveType == MOVE_BLANK){
+                if (move.moveType == MOVE_BLANK) {
                     iter.remove();
                 }
             }
         }
     }
 
-    private void checkSquareMoves(CheckerLocation location, boolean continueKill, int prevDirection, MoveLocation moveIn, int playerNum, boolean isKing) {
+    public void checkSquareMoves(CheckerLocation location, boolean continueKill, int prevDirection, MoveLocation moveIn, int playerNum, boolean isKing, ArrayList<MoveLocation> moveList) {
         boolean noMoreJumps = true;
         for (int direc : moveDirections) {
             if (!continueKill || direc != getOppositeDirection(prevDirection)) {
@@ -125,17 +125,17 @@ public class CheckersGame extends JPanel implements ActionListener, MouseListene
                             moveOut = new MoveLocation(moveIn);
                         }
                         moveOut.jumps.add(new CheckerLocation(move.xDestination, move.yDestination));
-                        checkSquareMoves(new CheckerLocation(move.xDestination, move.yDestination), true, direc, moveOut, playerNum, isKing);
+                        checkSquareMoves(new CheckerLocation(move.xDestination, move.yDestination), true, direc, moveOut, playerNum, isKing, moveList);
                         noMoreJumps = false;
                     } else {
                         move.jumps.add(new CheckerLocation(move.xDestination, move.yDestination));
-                        validMoves.add(move);
+                        moveList.add(move);
                     }
                 }
             }
         }
         if (noMoreJumps && continueKill) {
-            validMoves.add(moveIn);
+            moveList.add(moveIn);
         }
     }
 

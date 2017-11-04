@@ -6,10 +6,10 @@ import java.util.ArrayList;
  * Created by abhinav on 10/19/2017.
  * Basic board class
  */
-class Board {
+public class Board {
 
 
-    static Checker[][] boardPieces;
+    public static Checker[][] boardPieces;
     static ArrayList<CheckerLocation> blackPieceLocations;
     static ArrayList<CheckerLocation> redPieceLocations;
 
