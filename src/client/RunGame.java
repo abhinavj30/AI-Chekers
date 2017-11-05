@@ -19,7 +19,7 @@ public class RunGame extends JFrame {
         int aiTime = 3;
         int playerConfig = JOptionPane.showOptionDialog(null, "Pick player configuration", "Options", JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE, null, options, options[0]);
         if (playerConfig != 3){
-            aiTime = (int) JOptionPane.showInputDialog(null, "Enter AI time limit", "AI Time", JOptionPane.INFORMATION_MESSAGE, null, timeOptions, timeOptions[0]);
+            aiTime = (int) JOptionPane.showInputDialog(null, "Select AI time limit (yes, I'm that lazy)", "AI Time", JOptionPane.INFORMATION_MESSAGE, null, timeOptions, timeOptions[0]);
         }
 
         switch (playerConfig) {

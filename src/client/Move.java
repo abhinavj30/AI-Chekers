@@ -2,7 +2,7 @@ package client;
 
 import java.util.ArrayList;
 
-public class MoveLocation {
+public class Move {
 
     private final int NO_MOVE = 0;
     private final int MOVE_BLANK = 1;
@@ -15,7 +15,7 @@ public class MoveLocation {
     final int yDestination;
     ArrayList<CheckerLocation> jumps;
 
-    MoveLocation(int xLoc, int yLoc, int xDest, int yDest, int moveTypeIn) {
+    Move(int xLoc, int yLoc, int xDest, int yDest, int moveTypeIn) {
         xSource = xLoc;
         ySource = yLoc;
         xDestination = xDest;
@@ -24,7 +24,7 @@ public class MoveLocation {
         jumps = new ArrayList<>();
     }
 
-    public MoveLocation(MoveLocation move){
+    public Move(Move move){
         this.moveType = move.moveType;
         this.xSource = move.xSource;
         this.ySource = move.ySource;
@@ -38,8 +38,8 @@ public class MoveLocation {
 
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof MoveLocation) {
-            MoveLocation loc = (MoveLocation) obj;
+        if (obj instanceof Move) {
+            Move loc = (Move) obj;
             if (xSource == loc.xSource && ySource == loc.ySource && xDestination == loc.xDestination &&
                     yDestination == loc.yDestination && moveType == loc.moveType) {
                 return true;

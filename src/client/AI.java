@@ -1,6 +1,4 @@
-package AI;
-
-import client.*;
+package client;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -19,20 +17,31 @@ public class AI {
     private boolean timeOver = false;
 
     private final long timeLimit;
-    private MoveLocation chosenMove;
+    private Move chosenMove;
 
     public AI(int playerNum, int timeLimit){
         this.playerNum = playerNum;
         this.timeLimit = timeLimit;
     }
 
-    private MoveLocation aiMove(){
+    public Move aiMove(){
+        System.out.println("AI making move...");
+        chosenMove = null;
         startTime = (new Date()).getTime();
 
+        ArrayList<Move> tempList = new ArrayList<>();
+        Board testBoard = new Board(gameBoard);
+
+        newGame.checkValidMoves(validMoves, gameBoard, 1);
+
+
+        System.out.println("Moves found in AI: " + tempList.size());
+        //chosenMove = tempList.get((new Random()).nextInt(tempList.size()));
+        return null;
+        /*
         for (int depth = 1; depth < 12; depth++){
             alphaBetaSearch(new Board(gameBoard), depth, Long.MIN_VALUE, Long.MAX_VALUE, true, true);
-        }
-        return chosenMove;
+        }*/
     }
 
     private long alphaBetaSearch(Board boardIn, int depth, long alphaIn, long betaIn, boolean max, boolean isRoot){
@@ -45,7 +54,7 @@ public class AI {
             long beta = betaIn;
             long branchValue;
 
-            ArrayList<MoveLocation> moves = new ArrayList<>();
+            ArrayList<Move> moves = new ArrayList<>();
             if (max){
                 newGame.checkValidMoves(moves, boardIn, playerNum);
             } else {
@@ -57,18 +66,18 @@ public class AI {
             }
             if (max){
                 branchValue = Long.MIN_VALUE;
-                for (MoveLocation move : moves){
+                for (Move move : moves){
                     Board board = new Board(boardIn);
                     board.pieceMover(move);
                     long childValue = alphaBetaSearch(board,depth - 1, alpha, beta,false, false);
                     if (childValue > branchValue){
                         branchValue = childValue;
                         if (isRoot){
-                            chosenMove = new MoveLocation(move);
+                            chosenMove = new Move(move);
                         }
                     } else if (childValue == branchValue && isRoot){
                         if ((new Random()).nextBoolean()){
-                            chosenMove = new MoveLocation(move);
+                            chosenMove = new Move(move);
                         }
                     }
                     if (branchValue > alpha){
@@ -81,7 +90,7 @@ public class AI {
                 return branchValue;
             } else {
                 branchValue = Long.MAX_VALUE;
-                for (MoveLocation move : moves){
+                for (Move move : moves){
                     Board board = new Board(boardIn);
                     board.pieceMover(move);
                     long childValue = alphaBetaSearch(board,depth - 1, alpha, beta,false, false);

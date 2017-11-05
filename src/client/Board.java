@@ -2,6 +2,10 @@ package client;
 
 import java.util.ArrayList;
 
+
+import static client.CheckersGame.gameBoard;
+import static client.RunGame.newGame;
+
 /**
  * Created by abhinav on 10/19/2017.
  * Basic board class
@@ -45,9 +49,22 @@ public class Board {
     }
 
     public Board(Board inBoard) {
-        this.boardPieces = inBoard.boardPieces;
-        this.blackPieceLocations = inBoard.blackPieceLocations;
-        this.redPieceLocations = inBoard.redPieceLocations;
+        boardPieces = new Checker[8][8];
+        this.blackPieceLocations = new ArrayList<>();
+        this.redPieceLocations = new ArrayList<>();
+
+        for (int i = 0; i < 8; i++){
+            for (int j =0; j < 8; j++){
+                this.boardPieces[i][j] = new Checker(inBoard.boardPieces[i][j]);
+            }
+        }
+
+        for (CheckerLocation loc :inBoard.blackPieceLocations){
+            this.blackPieceLocations.add(new CheckerLocation(loc));
+        }
+        for (CheckerLocation loc : inBoard.redPieceLocations) {
+            this.redPieceLocations.add(new CheckerLocation(loc));
+        }
     }
 
     private void initializeBoard() {
@@ -68,7 +85,7 @@ public class Board {
         }
     }
 
-    public MoveLocation checkMove(int direction, int iOrig, int jOrig, int playerNum, boolean king, boolean postKill) {
+    public Move checkMove(int direction, int iOrig, int jOrig, int playerNum, boolean king, boolean postKill) {
         if (king || playerNum == ((direction % 10) % 3) + 1) {
             int[] destCoords = {iOrig + (direction % 5) - 2, jOrig + (direction % 4) - 2};
             for (int coord : destCoords) {
@@ -78,7 +95,7 @@ public class Board {
             }
             if (boardPieces[destCoords[0]][destCoords[1]].getPieceColor() == EMPTY) {
                 if (!postKill) {
-                    return new MoveLocation(iOrig, jOrig, destCoords[0], destCoords[1], MOVE_BLANK);
+                    return new Move(iOrig, jOrig, destCoords[0], destCoords[1], MOVE_BLANK);
                 }
             } else if (boardPieces[destCoords[0]][destCoords[1]].getPieceColor() == playerNum) {
                 return null;
@@ -92,7 +109,7 @@ public class Board {
                     }
                 }
                 if (boardPieces[killCoords[0]][killCoords[1]].getPieceColor() == EMPTY) {
-                    return new MoveLocation(iOrig, jOrig, killCoords[0], killCoords[1], MOVE_KILL);
+                    return new Move(iOrig, jOrig, killCoords[0], killCoords[1], MOVE_KILL);
                 } else {
                     return null;
                 }
@@ -101,7 +118,14 @@ public class Board {
         return null;
     }
 
-    public void pieceMover(MoveLocation moveLoc) {
+    public void pieceMover(Move moveLoc) {
+
+        ArrayList<Move> testList = new ArrayList<>();
+        Board testBoard = new Board(gameBoard);
+        newGame.checkValidMoves(testList,testBoard, 2);
+        System.out.println("Moves found: " + testList.size());
+
+
         if (moveLoc.moveType == MOVE_BLANK) {
             this.movePiece(moveLoc.xSource, moveLoc.ySource, moveLoc.xDestination, moveLoc.yDestination);
         } else {

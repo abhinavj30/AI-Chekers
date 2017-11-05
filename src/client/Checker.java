@@ -43,4 +43,9 @@ public class Checker {
         pieceColor = color;
         isKing = king;
     }
+
+    Checker(Checker checkerIn){
+        this.pieceColor = checkerIn.pieceColor;
+        this.isKing = checkerIn.isKing;
+    }
 }
