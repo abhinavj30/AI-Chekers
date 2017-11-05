@@ -9,15 +9,14 @@ import java.util.ArrayList;
 public class Board {
 
 
-    public static Checker[][] boardPieces;
-    static ArrayList<CheckerLocation> blackPieceLocations;
-    static ArrayList<CheckerLocation> redPieceLocations;
+    public Checker[][] boardPieces;
+    public ArrayList<CheckerLocation> blackPieceLocations;
+    public ArrayList<CheckerLocation> redPieceLocations;
 
     private final int EMPTY = 0;
     private final int BLACK = 1;
     private final int RED = 2;
 
-    private final int NO_MOVE = 0;
     private final int MOVE_BLANK = 1;
     private final int MOVE_KILL = 2;
 
@@ -26,7 +25,7 @@ public class Board {
     private final int MOVE_UP_RIGHT = 11;
     private final int MOVE_UP_LEFT = 1;
 
-    private static int[] moveDirections = {1, 3, 11, 13};
+    private final int[] moveDirections = {1, 3, 11, 13};
 
     Board() {
         boardPieces = new Checker[8][8];
@@ -43,6 +42,12 @@ public class Board {
                 System.out.print(boardPieces[i][j].getPieceColor());
             }
         }
+    }
+
+    public Board(Board inBoard) {
+        this.boardPieces = inBoard.boardPieces;
+        this.blackPieceLocations = inBoard.blackPieceLocations;
+        this.redPieceLocations = inBoard.redPieceLocations;
     }
 
     private void initializeBoard() {
@@ -63,8 +68,8 @@ public class Board {
         }
     }
 
-    MoveLocation checkMove(int direction, int iOrig, int jOrig, int playerNum, boolean king, boolean postKill) {
-        if (boardPieces[iOrig][jOrig].isKing() || playerNum == ((direction % 10) % 3) + 1) {
+    public MoveLocation checkMove(int direction, int iOrig, int jOrig, int playerNum, boolean king, boolean postKill) {
+        if (king || playerNum == ((direction % 10) % 3) + 1) {
             int[] destCoords = {iOrig + (direction % 5) - 2, jOrig + (direction % 4) - 2};
             for (int coord : destCoords) {
                 if (coord < 0 || coord > 7) {
@@ -96,15 +101,15 @@ public class Board {
         return null;
     }
 
-    int pieceMover(MoveLocation moveLoc) {
+    public void pieceMover(MoveLocation moveLoc) {
         if (moveLoc.moveType == MOVE_BLANK) {
             this.movePiece(moveLoc.xSource, moveLoc.ySource, moveLoc.xDestination, moveLoc.yDestination);
         } else {
             CheckerLocation dest;
             CheckerLocation source;
-            for (int i = 0; i < moveLoc.jumps.size(); i++){
+            for (int i = 0; i < moveLoc.jumps.size(); i++) {
                 dest = moveLoc.jumps.get(i);
-                if (i == 0){
+                if (i == 0) {
                     source = new CheckerLocation(moveLoc.xSource, moveLoc.ySource);
                 } else {
                     source = moveLoc.jumps.get(i - 1);
@@ -112,9 +117,7 @@ public class Board {
                 this.movePiece(source.xLocation, source.yLocation, dest.xLocation, dest.yLocation);
                 this.removeChecker((source.xLocation + dest.xLocation) / 2, (source.yLocation + dest.yLocation) / 2);
             }
-            return 1;
         }
-        return 0;
     }
 
     private void removeChecker(int iLoc, int jLoc) {
@@ -136,7 +139,7 @@ public class Board {
             redPieceLocations.add(new CheckerLocation(iDest, jDest));
         }
         if (iDest == 0 || iDest == 7) {
-            boardPieces[iDest][jDest].setKing(true);
+            boardPieces[iDest][jDest].makeKing();
         }
         boardPieces[iOrig][jOrig] = new Checker();
     }

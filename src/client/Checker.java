@@ -25,8 +25,8 @@ public class Checker {
         return isKing;
     }
 
-    void setKing(boolean king) {
-        isKing = king;
+    void makeKing() {
+        isKing = true;
     }
 
     public Checker(int color) {

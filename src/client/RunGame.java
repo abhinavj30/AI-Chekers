@@ -7,7 +7,7 @@ import client.CheckersGame;
  */
 public class RunGame {
 
-    static CheckersGame newGame;
+    public static CheckersGame newGame;
 
     public static void main(String[] args) {
         System.out.print("Starting game...");

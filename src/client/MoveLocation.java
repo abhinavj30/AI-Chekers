@@ -24,13 +24,16 @@ public class MoveLocation {
         jumps = new ArrayList<>();
     }
 
-    MoveLocation(MoveLocation loc){
-        this.moveType = loc.moveType;
-        this.xSource = loc.xSource;
-        this.ySource = loc.ySource;
-        this.xDestination = loc.xDestination;
-        this.yDestination = loc.yDestination;
-        this.jumps = loc.jumps;
+    public MoveLocation(MoveLocation move){
+        this.moveType = move.moveType;
+        this.xSource = move.xSource;
+        this.ySource = move.ySource;
+        this.xDestination = move.xDestination;
+        this.yDestination = move.yDestination;
+        jumps = new ArrayList<>();
+        for (CheckerLocation loc : move.jumps){
+            this.jumps.add(new CheckerLocation(loc));
+        }
     }
 
     @Override

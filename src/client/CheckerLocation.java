@@ -2,17 +2,17 @@ package client;
 
 public class CheckerLocation {
 
-    int xLocation;
-    int yLocation;
+    final int xLocation;
+    final int yLocation;
 
     CheckerLocation(int xLoc, int yLoc){
         xLocation = xLoc;
         yLocation = yLoc;
     }
 
-    CheckerLocation(){
-        xLocation = 0;
-        yLocation = 0;
+    CheckerLocation(CheckerLocation loc){
+        this.xLocation = loc.xLocation;
+        this.yLocation = loc.yLocation;
     }
 
     @Override
