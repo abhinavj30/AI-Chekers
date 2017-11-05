@@ -12,6 +12,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.ArrayList;
 import java.util.Iterator;
+import AI.*;
 
 public class CheckersGame extends JPanel implements ActionListener, MouseListener {
 
@@ -37,20 +38,33 @@ public class CheckersGame extends JPanel implements ActionListener, MouseListene
     private static CheckerLocation selectedBlock;
     private static int currentPlayer;
 
+    private final boolean blackIsAI;
+    private final boolean redIsAI;
+    private final int aiTime;
+
     private static boolean postKill = false;
     private static boolean killAvailable = false;
 
     private static int gameStatus;
 
-    CheckersGame() {
+    private AI blackAI;
+    private AI redAI;
+
+    CheckersGame(boolean oneIsAI, boolean twoIsAI, int aiTime) {
+        blackIsAI = oneIsAI;
+        redIsAI = twoIsAI;
+        this.aiTime = aiTime;
+
         gameBoard = new Board();
         setupWindow();
-        startGame(false, false);
-        repaint();
+        startGame();
         frame.setSize(800, 800);
     }
 
-    private void startGame(boolean oneIsAI, boolean twoIsAI) {
+    private void startGame() {
+        repaint();
+        blackAI = new AI(BLACK, aiTime);
+        redAI = new AI(RED, aiTime);
         currentPlayer = BLACK;
         System.out.println();
         selectedBlock = new CheckerLocation(2, 2);
@@ -144,18 +158,13 @@ public class CheckersGame extends JPanel implements ActionListener, MouseListene
     }
 
     public void makeMove(MoveLocation move) {
-        if (move.moveType == MOVE_KILL) {
-            if (currentPlayer == BLACK) {
-                blackScore--;
-            } else {
-                redScore--;
-            }
-            System.out.println("Score: Black - " + blackScore + ", Red - " + redScore);
-            if (redScore * blackScore == 0) {
-                System.out.println("Game Over");
-            }
-        }
         gameBoard.pieceMover(move);
+        blackScore = gameBoard.blackPieceLocations.size();
+        redScore = gameBoard.redPieceLocations.size();
+        System.out.println("Score: Black - " + blackScore + ", Red - " + redScore);
+        if (redScore * blackScore == 0) {
+            System.out.println("Game Over");
+        }
         changePlayer();
     }
 
@@ -225,19 +234,6 @@ public class CheckersGame extends JPanel implements ActionListener, MouseListene
     private void updateBoard() {
         validMoves = new ArrayList<>();
         checkValidMoves(validMoves, gameBoard, currentPlayer);
-        boolean moreKills = false;
-        if (postKill) {
-            for (MoveLocation loc : validMoves) {
-                if (loc.moveType == MOVE_KILL) {
-                    moreKills = true;
-                }
-            }
-            if (!moreKills) {
-                postKill = false;
-                changePlayer();
-            }
-
-        }
         repaint();
     }
 

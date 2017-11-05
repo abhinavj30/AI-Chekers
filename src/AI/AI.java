@@ -9,7 +9,7 @@ import java.util.Random;
 import static client.RunGame.newGame;
 import static client.CheckersGame.*;
 
-class AI {
+public class AI {
     final int RED = 0;
     final int BLACK = 1;
 
@@ -21,18 +21,18 @@ class AI {
     private final long timeLimit;
     private MoveLocation chosenMove;
 
-    AI(int playerNum, int timeLimit){
+    public AI(int playerNum, int timeLimit){
         this.playerNum = playerNum;
         this.timeLimit = timeLimit;
     }
 
-    private void aiMove(){
+    private MoveLocation aiMove(){
         startTime = (new Date()).getTime();
 
         for (int depth = 1; depth < 12; depth++){
             alphaBetaSearch(new Board(gameBoard), depth, Long.MIN_VALUE, Long.MAX_VALUE, true, true);
         }
-        newGame.makeMove(chosenMove);
+        return chosenMove;
     }
 
     private long alphaBetaSearch(Board boardIn, int depth, long alphaIn, long betaIn, boolean max, boolean isRoot){
