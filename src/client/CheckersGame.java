@@ -5,11 +5,13 @@ package client;
  */
 
 import javax.swing.*;
+import javax.xml.soap.Text;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Iterator;
 
@@ -45,6 +47,8 @@ public class CheckersGame extends JPanel implements ActionListener, MouseListene
 
     private static int gameStatus;
 
+    private static TextAreaOutputStream consoleWindow;
+
     private AI blackAI;
     private AI redAI;
 
@@ -78,30 +82,6 @@ public class CheckersGame extends JPanel implements ActionListener, MouseListene
         if (blackIsAI){
             makeMove(blackAI.aiMove());
         }
-
-        /*
-        if (blackIsAI || redIsAI){
-            while (redScore != 0 || blackScore != 0){
-                if (blackIsAI && currentPlayer == BLACK){
-                    System.out.println("Black AI plays now...");
-                    Move testMove = blackAI.aiMove();
-                    makeMove(testMove);
-                    repaint();
-                }
-                if (redIsAI && currentPlayer == RED) {
-                    System.out.println("Red AI plays now...");
-                    Move testMove2 = redAI.aiMove();
-                    makeMove(testMove2);
-                    repaint();
-                } else {
-                    if (!waitingForPlayer) {
-                        System.out.println("Waiting for human player " + currentPlayer + " to make a move...");
-                        waitingForPlayer = true;
-                    }
-                    System.out.println(currentPlayer);
-                }
-            }
-        }*/
     }
 
     private void setupWindow() {

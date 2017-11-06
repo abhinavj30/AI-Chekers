@@ -47,4 +47,13 @@ public class Move {
         }
         return false;
     }
+
+    Move(){
+        xSource = -1;
+        ySource = -1;
+        xDestination = -1;
+        yDestination = -1;
+        moveType = NO_MOVE;
+        jumps = new ArrayList<>();
+    }
 }

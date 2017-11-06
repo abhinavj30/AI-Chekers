@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="AI-Chekers:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/AI_Chekers_jar</output-path>
+    <root id="archive" name="AI-Chekers.jar">
+      <element id="module-output" name="AI-Chekers" />
+    </root>
+  </artifact>
+</component>

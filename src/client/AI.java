@@ -5,10 +5,10 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.Random;
 
-import static client.RunGame.newGame;
 import static client.CheckersGame.*;
 
 public class AI {
+
     final int BLACK = 1;
     final int RED = 2;
 
@@ -47,18 +47,24 @@ public class AI {
 
 
         System.out.println("Moves found in AI: " + tempList.size());
-        //chosenMove = tempList.get((new Random()).nextInt(tempList.size()));
+
         if (tempList.size() == 1){
             return tempList.get(0);
         }
-
-        for (int depth = 5; depth < 8; depth++){
+        Move returnMove = new Move();
+        for (int depth = 5; depth < 15; depth++){
             System.gc();
             System.out.println("Searching at depth " + depth);
             if (timeOver){
                 System.out.println("Time's up...");
             }
             alphaBetaSearch(new Board(gameBoard), depth, Long.MIN_VALUE, Long.MAX_VALUE, true, true);
+            if (!timeOver){
+                returnMove = new Move(chosenMove);
+            }
+        }
+        if (returnMove.moveType == 0){
+            return null;
         }
         return chosenMove;
     }
