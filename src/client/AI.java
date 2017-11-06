@@ -241,7 +241,37 @@ class AI {
     }
 
     private int calculateHeuristic(Board boardIn) {
+        long retVal = 0;
+        if (playerNum == BLACK){
+            retVal += numPiecesValue(boardIn, playerNum);
+            retVal -= numPiecesValue(boardIn, (playerNum % 2) + 1);
+        }
         Random random = new Random();
         return random.nextInt(10);
+    }
+
+    private long numPiecesValue(Board boardIn, int playerNum){
+        long retVal = 0;
+        if (playerNum == BLACK){
+            for (CheckerLocation loc : boardIn.getBlackPieceLocations()){
+                retVal += (boardIn.getBoardPieces()[loc.xLocation][loc.yLocation].isKing()) ? 5 : 3;
+            }
+        } else {
+            for (CheckerLocation loc : boardIn.getRedPieceLocations()){
+                retVal += (boardIn.getBoardPieces()[loc.xLocation][loc.yLocation].isKing()) ? 5 : 3;
+            }
+        }
+        return retVal;
+    }
+
+    private long kingDistance (Board boardIn, int playerNum){
+        long retVal = 0;
+        if (playerNum == BLACK){
+            for (CheckerLocation loc : boardIn.getBlackPieceLocations()){
+                retVal += (7 - loc.xLocation);
+            }
+            retVal = retVal / boardIn.getBlackPieceLocations().size();
+        }
+        return retVal;
     }
 }
