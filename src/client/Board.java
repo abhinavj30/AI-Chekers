@@ -59,8 +59,8 @@ public class Board {
                 boardPieces[i][j] = new Checker();
             }
         }
-        this.initBoard2();
-        //this.initializeBoard();
+        //this.initBoard2();
+        this.initializeBoard();
 
         for (int i = 0; i < 8; i++) {
             System.out.println();
@@ -94,13 +94,13 @@ public class Board {
 
         blackPieceLocations = new ArrayList<>();
         redPieceLocations = new ArrayList<>();
-        for (int i = 0; i < 1; i++) {
+        for (int i = 0; i < 3; i++) {
             for (int j = (i + 1) % 2; j < 8; j += 2) {
                 boardPieces[i][j].setPieceColor(BLACK);
                 blackPieceLocations.add(new CheckerLocation(i, j));
             }
         }
-        for (int i = 5; i < 6; i++) {
+        for (int i = 5; i < 8; i++) {
             for (int j = (i + 1) % 2; j < 8; j += 2) {
                 boardPieces[i][j].setPieceColor(RED);
                 redPieceLocations.add(new CheckerLocation(i, j));
