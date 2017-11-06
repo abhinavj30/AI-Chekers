@@ -119,13 +119,6 @@ public class Board {
     }
 
     public void pieceMover(Move moveLoc) {
-
-        ArrayList<Move> testList = new ArrayList<>();
-        Board testBoard = new Board(gameBoard);
-        newGame.checkValidMoves(testList,testBoard, 2);
-        System.out.println("Moves found: " + testList.size());
-
-
         if (moveLoc.moveType == MOVE_BLANK) {
             this.movePiece(moveLoc.xSource, moveLoc.ySource, moveLoc.xDestination, moveLoc.yDestination);
         } else {

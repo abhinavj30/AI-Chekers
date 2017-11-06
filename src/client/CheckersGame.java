@@ -41,8 +41,7 @@ public class CheckersGame extends JPanel implements ActionListener, MouseListene
     private final boolean redIsAI;
     private final int aiTime;
 
-    private static boolean postKill = false;
-    //private static boolean killAvailable = false;
+    private static boolean waitingForPlayer = false;
 
     private static int gameStatus;
 
@@ -72,39 +71,36 @@ public class CheckersGame extends JPanel implements ActionListener, MouseListene
         currentPlayer = BLACK;
 
         System.out.println();
-        selectedBlock = new CheckerLocation(2, 2);
+        selectedBlock = new CheckerLocation(-1, -1);
 
         validMoves = new ArrayList<>();
         checkValidMoves(validMoves, gameBoard, currentPlayer);
-
-
-        if (blackIsAI || redIsAI){
-            while (redScore != 0 || blackScore != 0){
-                if (blackIsAI && currentPlayer == BLACK){
-                    Board testBoard = new Board(gameBoard);
-                    ArrayList<Move> testList = new ArrayList<>();
-                    checkValidMoves(testList, testBoard, BLACK);
-                    System.out.println("Moves found: " + testList.size());
-                    //Move testMove = blackAI.aiMove();
-                    //makeMove(testMove);
-                    break;
-                }
-                if (redIsAI && currentPlayer == RED) {
-                    redAI.aiMove();
-                }
-            }
+        if (blackIsAI){
+            makeMove(blackAI.aiMove());
         }
 
         /*
-
-        while (redPieceLocations.size() != 0 && blackPieceLocations.size() != 0) {
-            System.out.println("Color: " + boardPieces[2][0].getPieceColor());
-            selectedBlock = new CheckerLocation(2, 4);
-            checkValidMoves();
-            return;
-            //Black plays first;
-            //Wait for play
-
+        if (blackIsAI || redIsAI){
+            while (redScore != 0 || blackScore != 0){
+                if (blackIsAI && currentPlayer == BLACK){
+                    System.out.println("Black AI plays now...");
+                    Move testMove = blackAI.aiMove();
+                    makeMove(testMove);
+                    repaint();
+                }
+                if (redIsAI && currentPlayer == RED) {
+                    System.out.println("Red AI plays now...");
+                    Move testMove2 = redAI.aiMove();
+                    makeMove(testMove2);
+                    repaint();
+                } else {
+                    if (!waitingForPlayer) {
+                        System.out.println("Waiting for human player " + currentPlayer + " to make a move...");
+                        waitingForPlayer = true;
+                    }
+                    System.out.println(currentPlayer);
+                }
+            }
         }*/
     }
 
@@ -120,7 +116,7 @@ public class CheckersGame extends JPanel implements ActionListener, MouseListene
         frame.add(this);
     }
 
-    public void checkValidMoves(ArrayList<Move> moveList, Board boardIn, int player) {
+    void checkValidMoves(ArrayList<Move> moveList, Board boardIn, int player) {
         System.out.println("Checking valid moves...");
         boolean killAvailable = false;
         ArrayList<CheckerLocation> currentCheckers = new ArrayList<>();
@@ -149,7 +145,7 @@ public class CheckersGame extends JPanel implements ActionListener, MouseListene
         }
     }
 
-    public void checkSquareMoves(CheckerLocation location, boolean continueKill, int prevDirection, Move moveIn, int playerNum, boolean isKing, ArrayList<Move> moveList, Board boardIn) {
+    private void checkSquareMoves(CheckerLocation location, boolean continueKill, int prevDirection, Move moveIn, int playerNum, boolean isKing, ArrayList<Move> moveList, Board boardIn) {
         boolean noMoreJumps = true;
         for (int direc : moveDirections) {
             if (!continueKill || direc != getOppositeDirection(prevDirection)) {
@@ -195,7 +191,10 @@ public class CheckersGame extends JPanel implements ActionListener, MouseListene
         System.out.println("Score: Black - " + blackScore + ", Red - " + redScore);
         if (redScore * blackScore == 0) {
             System.out.println("Game Over");
+            JOptionPane.showMessageDialog(null, "Game Over", "Game Over", JOptionPane.INFORMATION_MESSAGE);
+            System.exit(0);
         }
+        repaint();
         changePlayer();
     }
 
@@ -203,10 +202,17 @@ public class CheckersGame extends JPanel implements ActionListener, MouseListene
         if (currentPlayer == BLACK) {
             System.out.println("Red plays now");
             currentPlayer = RED;
+            if (redIsAI){
+                makeMove(redAI.aiMove());
+            }
         } else {
             System.out.println("Black plays now");
             currentPlayer = BLACK;
+            if (blackIsAI){
+                makeMove(blackAI.aiMove());
+            }
         }
+        System.out.println("current player: " + currentPlayer);
     }
 
     private void printMove(Move move) {
@@ -276,16 +282,6 @@ public class CheckersGame extends JPanel implements ActionListener, MouseListene
     }
 
     @Override
-    public void actionPerformed(ActionEvent e) {
-
-    }
-
-    @Override
-    public void mouseClicked(MouseEvent e) {
-
-    }
-
-    @Override
     public void mousePressed(MouseEvent e) {
         int selectedCol = (e.getX() - 8) / 90;
         int selectedRow = (e.getY() - 30) / 90;
@@ -296,14 +292,25 @@ public class CheckersGame extends JPanel implements ActionListener, MouseListene
                 makeMove(loc);
                 selectedBlock = new CheckerLocation(selectedRow, selectedCol);
                 updateBoard();
+                waitingForPlayer = false;
                 return;
             }
 
         }
-        if (gameBoard.boardPieces[selectedRow][selectedCol].getPieceColor() == currentPlayer && !postKill) {
+        if (gameBoard.boardPieces[selectedRow][selectedCol].getPieceColor() == currentPlayer) {
             selectedBlock = new CheckerLocation(selectedRow, selectedCol);
         }
         updateBoard();
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+
+    }
+
+    @Override
+    public void mouseClicked(MouseEvent e) {
+
     }
 
     @Override
