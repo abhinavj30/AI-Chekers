@@ -41,11 +41,23 @@ public class Move {
         if (obj instanceof Move) {
             Move loc = (Move) obj;
             if (xSource == loc.xSource && ySource == loc.ySource && xDestination == loc.xDestination &&
-                    yDestination == loc.yDestination && moveType == loc.moveType) {
+                    yDestination == loc.yDestination && moveType == loc.moveType && equalsJumps(loc.jumps)) {
                 return true;
             }
         }
         return false;
+    }
+
+    private boolean equalsJumps (ArrayList<CheckerLocation> jumpsIn){
+        for (int i = 0; i < jumpsIn.size(); i++){
+            if (jumps.size() != jumpsIn.size()){
+                return false;
+            }
+            if (jumpsIn.get(i) != jumpsIn.get(i)){
+                return false;
+            }
+        }
+        return true;
     }
 
     Move(){

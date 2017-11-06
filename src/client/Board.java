@@ -13,9 +13,30 @@ import static client.RunGame.newGame;
 public class Board {
 
 
-    public Checker[][] boardPieces;
-    public ArrayList<CheckerLocation> blackPieceLocations;
-    public ArrayList<CheckerLocation> redPieceLocations;
+    public Checker[][] getBoardPieces() {
+        return boardPieces;
+    }
+    public void setBoardPieces(Checker[][] boardPieces) {
+        this.boardPieces = boardPieces;
+    }
+    private Checker[][] boardPieces;
+
+
+    public ArrayList<CheckerLocation> getBlackPieceLocations() {
+        return blackPieceLocations;
+    }
+    public void setBlackPieceLocations(ArrayList<CheckerLocation> blackPieceLocations) {
+        this.blackPieceLocations = blackPieceLocations;
+    }
+    private ArrayList<CheckerLocation> blackPieceLocations;
+
+    public ArrayList<CheckerLocation> getRedPieceLocations() {
+        return redPieceLocations;
+    }
+    public void setRedPieceLocations(ArrayList<CheckerLocation> redPieceLocations) {
+        this.redPieceLocations = redPieceLocations;
+    }
+    private ArrayList<CheckerLocation> redPieceLocations;
 
     private final int EMPTY = 0;
     private final int BLACK = 1;
@@ -38,12 +59,14 @@ public class Board {
                 boardPieces[i][j] = new Checker();
             }
         }
-        this.initializeBoard();
+        this.initBoard2();
+        //this.initializeBoard();
 
         for (int i = 0; i < 8; i++) {
             System.out.println();
             for (int j = 0; j < 8; j++) {
-                System.out.print(boardPieces[i][j].getPieceColor());
+                int kingVal = (boardPieces[i][j].isKing()) ? 2 : 0;
+                System.out.print((boardPieces[i][j].getPieceColor() + kingVal) + " ");
             }
         }
     }
@@ -71,18 +94,39 @@ public class Board {
 
         blackPieceLocations = new ArrayList<>();
         redPieceLocations = new ArrayList<>();
-        for (int i = 0; i < 3; i++) {
-            for (int j = i % 2; j < 8; j += 2) {
+        for (int i = 0; i < 1; i++) {
+            for (int j = (i + 1) % 2; j < 8; j += 2) {
                 boardPieces[i][j].setPieceColor(BLACK);
                 blackPieceLocations.add(new CheckerLocation(i, j));
             }
         }
-        for (int i = 5; i < 8; i++) {
-            for (int j = i % 2; j < 8; j += 2) {
+        for (int i = 5; i < 6; i++) {
+            for (int j = (i + 1) % 2; j < 8; j += 2) {
                 boardPieces[i][j].setPieceColor(RED);
                 redPieceLocations.add(new CheckerLocation(i, j));
             }
         }
+    }
+
+    private void initBoard2() {
+        blackPieceLocations = new ArrayList<>();
+        redPieceLocations = new ArrayList<>();
+
+        boardPieces[1][4].setPieceColor(RED);
+        redPieceLocations.add(new CheckerLocation(1, 4));
+        boardPieces[1][6].setPieceColor(RED);
+        redPieceLocations.add(new CheckerLocation(1, 6));
+        boardPieces[3][4].setPieceColor(RED);
+        redPieceLocations.add(new CheckerLocation(3, 4));
+        boardPieces[3][6].setPieceColor(RED);
+        redPieceLocations.add(new CheckerLocation(3, 6));
+
+        boardPieces[4][5].setPieceColor(BLACK);
+        boardPieces[4][5].makeKing();
+        blackPieceLocations.add(new CheckerLocation(4, 5));
+
+
+
     }
 
     public Move checkMove(int direction, int iOrig, int jOrig, int playerNum, boolean king, boolean postKill) {
