@@ -162,9 +162,9 @@ public class Board {
         return null;
     }
 
-    public void pieceMover(Move moveLoc) {
+    public void pieceMover(Move moveLoc, boolean noKing) {
         if (moveLoc.moveType == MOVE_BLANK) {
-            this.movePiece(moveLoc.xSource, moveLoc.ySource, moveLoc.xDestination, moveLoc.yDestination);
+            this.movePiece(moveLoc.xSource, moveLoc.ySource, moveLoc.xDestination, moveLoc.yDestination, false);
         } else {
             CheckerLocation dest;
             CheckerLocation source;
@@ -175,7 +175,7 @@ public class Board {
                 } else {
                     source = moveLoc.jumps.get(i - 1);
                 }
-                this.movePiece(source.xLocation, source.yLocation, dest.xLocation, dest.yLocation);
+                this.movePiece(source.xLocation, source.yLocation, dest.xLocation, dest.yLocation, noKing);
                 this.removeChecker((source.xLocation + dest.xLocation) / 2, (source.yLocation + dest.yLocation) / 2);
             }
         }
@@ -190,7 +190,7 @@ public class Board {
         boardPieces[iLoc][jLoc] = new Checker();
     }
 
-    private void movePiece(int iOrig, int jOrig, int iDest, int jDest) {
+    private void movePiece(int iOrig, int jOrig, int iDest, int jDest, boolean noKing) {
         boardPieces[iDest][jDest] = new Checker(boardPieces[iOrig][jOrig].getPieceColor(), boardPieces[iOrig][jOrig].isKing());
         if (boardPieces[iOrig][jOrig].getPieceColor() == BLACK) {
             blackPieceLocations.remove(new CheckerLocation(iOrig, jOrig));
@@ -199,7 +199,7 @@ public class Board {
             redPieceLocations.remove(new CheckerLocation(iOrig, jOrig));
             redPieceLocations.add(new CheckerLocation(iDest, jDest));
         }
-        if (iDest == 0 || iDest == 7) {
+        if (!noKing && (iDest == 0 || iDest == 7)) {
             boardPieces[iDest][jDest].makeKing();
         }
         boardPieces[iOrig][jOrig] = new Checker();
