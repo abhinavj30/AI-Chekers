@@ -49,25 +49,26 @@ class AI {
             System.err.println(e.getMessage());
         }
 
-        System.out.println("Moves found in AI: " + moveList.size());
-
         if (moveList.size() == 1) {
+            System.out.println("AI making default move");
             return moveList.get(0);
         }
         Move returnMove = new Move();
-
-        for (int depth = 6; depth < 20; depth++) {
+        int depth;
+        for (depth = 6; depth < 9; depth++) {
             moveOptions = new ArrayList<>();
             System.gc();
-            System.out.println("Searching at depth " + depth);
+            alphaBetaSearch(new Board(gameBoard), depth, Long.MIN_VALUE, Long.MAX_VALUE, true, true);
             if (timeOver) {
-                System.out.println("Time's up...");
+                System.out.println("Time ran out after searching at depth " + (depth - 1));
                 break;
             }
-            alphaBetaSearch(new Board(gameBoard), depth, Long.MIN_VALUE, Long.MAX_VALUE, true, true);
             if (!timeOver) {
                 returnMove = new Move(pickMove(moveOptions));
             }
+        }
+        if (!timeOver) {
+            System.out.println("Searched till depth " + depth + " in " + ((new Date()).getTime() - startTime) + " ms");
         }
         System.out.println("Heuristic used: " + heuristicCalc);
         if (returnMove.moveType == 0) {
@@ -156,17 +157,6 @@ class AI {
         if (noMoreJumps && continueKill){
             moveList.add(new Move(moveIn));
         }
-    }
-
-    private int getOppositeDirection(int direction) {
-        int oppDirec = 1;
-        if (direction > 10) {
-            oppDirec += 10;
-        }
-        if (direction % 10 == 1) {
-            oppDirec += 2;
-        }
-        return oppDirec;
     }
 
     private long alphaBetaSearch(Board boardIn, int depth, long alphaIn, long betaIn, boolean max, boolean isRoot) {
@@ -281,10 +271,9 @@ class AI {
     }
 
     private long piecesLeftWeight (Board boardIn, int playerNum){
-        int numPieces = 0;
-        int blackPieces = boardIn.getBlackPieceLocations().size();
-        int redPieces = boardIn.getRedPieceLocations().size();
-        numPieces = blackPieces + redPieces;
+        int numPieces = boardIn.getBlackPieceLocations().size() + boardIn.getRedPieceLocations().size();
+        int blackPieces = gameBoard.getBlackPieceLocations().size();
+        int redPieces = gameBoard.getRedPieceLocations().size();
         if (playerNum == BLACK){
             if (blackPieces > redPieces){
                 return (24 - numPieces) * 99 / 24;
