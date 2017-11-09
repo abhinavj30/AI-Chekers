@@ -59,7 +59,7 @@ public class Board {
                 boardPieces[i][j] = new Checker();
             }
         }
-        //this.initBoard2();
+        //this.initBoard3();
         this.initializeBoard();
 
         for (int i = 0; i < 8; i++) {
@@ -124,9 +124,23 @@ public class Board {
         boardPieces[4][5].setPieceColor(BLACK);
         boardPieces[4][5].makeKing();
         blackPieceLocations.add(new CheckerLocation(4, 5));
+    }
 
+    private void initBoard3() {
+        blackPieceLocations = new ArrayList<>();
+        redPieceLocations = new ArrayList<>();
 
+        boardPieces[0][1].setPieceColor(RED);
+        boardPieces[0][1].makeKing();
+        redPieceLocations.add(new CheckerLocation(0, 1));
 
+        boardPieces[5][6].setPieceColor(BLACK);
+        boardPieces[5][6].makeKing();
+        blackPieceLocations.add(new CheckerLocation(5, 6));
+
+        boardPieces[7][2].setPieceColor(BLACK);
+        boardPieces[7][2].makeKing();
+        blackPieceLocations.add(new CheckerLocation(7, 2));
     }
 
     public Move checkMove(int direction, int iOrig, int jOrig, int playerNum, boolean king, boolean postKill) {

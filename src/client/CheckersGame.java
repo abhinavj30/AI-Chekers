@@ -68,7 +68,9 @@ public class CheckersGame extends JPanel implements ActionListener, MouseListene
         if (redIsAI){
             redAI = new AI(RED, aiTime);
         }
-        currentPlayer = BLACK;
+
+        currentPlayer = RED;
+        //currentPlayer = BLACK;
 
         System.out.println();
         selectedBlock = new CheckerLocation(-1, -1);
@@ -76,9 +78,13 @@ public class CheckersGame extends JPanel implements ActionListener, MouseListene
         updateBoard();
         printValidMoves();
 
-        if (blackIsAI){
-            makeMove(blackAI.aiMove());
+        if (redIsAI){
+            makeMove(redAI.aiMove());
         }
+
+        //if (blackIsAI){
+        //    makeMove(blackAI.aiMove());
+        //}
     }
 
     private void setupWindow() {
@@ -174,6 +180,11 @@ public class CheckersGame extends JPanel implements ActionListener, MouseListene
             currentPlayer = BLACK;
         }
         updateBoard();
+        if (validMoves.size() == 0){
+            System.out.println("Game Over");
+            JOptionPane.showMessageDialog(null, "Game Over", "Game Over", JOptionPane.INFORMATION_MESSAGE);
+            System.exit(0);
+        }
         printValidMoves();
         if (currentPlayer == BLACK && blackIsAI){
             makeMove(blackAI.aiMove());

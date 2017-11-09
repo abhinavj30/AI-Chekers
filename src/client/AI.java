@@ -228,7 +228,7 @@ class AI {
         long numPieces = numPiecesValue(boardIn, playerNum) - numPiecesValue(boardIn, (playerNum % 2) + 1);
         long avgToKing = (kingDistance(boardIn, (playerNum % 2) + 1) - kingDistance(boardIn, playerNum)) * 99 / 7;
         long piecesLeft = piecesLeftWeight(boardIn, playerNum);
-        long kingLoc = 0;
+        long kingLoc = kingLocation(boardIn, playerNum);
         long randomSafety = (new Random()).nextInt(9);
         heuristicCalc++;
         return (numPieces * 10000000) + (avgToKing * 100000) + (piecesLeft * 1000) + (kingLoc * 10) + (randomSafety);
@@ -290,6 +290,47 @@ class AI {
             } else {
                 return (numPieces) * 99 /24;
             }
+        }
+    }
+
+    private long kingLocation (Board boardIn, int playerNum){
+        int myKings = 0;
+        int enemyKings = 0;
+        int myKingsNum = 0;
+        int enemyKingsNum = 0;
+        if (playerNum == BLACK){
+            for (CheckerLocation loc : boardIn.getBlackPieceLocations()){
+                if (boardIn.getBoardPieces()[loc.xLocation][loc.yLocation].isKing()){
+                    myKings += Math.abs(loc.xLocation - loc.yLocation);
+                    myKingsNum++;
+                }
+            }
+            for (CheckerLocation loc : boardIn.getRedPieceLocations()){
+                if (boardIn.getBoardPieces()[loc.xLocation][loc.yLocation].isKing()){
+                    enemyKings += Math.abs(loc.xLocation - loc.yLocation);
+                    enemyKingsNum++;
+                }
+            }
+        } else {
+            for (CheckerLocation loc : boardIn.getRedPieceLocations()){
+                if (boardIn.getBoardPieces()[loc.xLocation][loc.yLocation].isKing()){
+                    myKings += Math.abs(loc.xLocation - loc.yLocation);
+                    myKingsNum++;
+                }
+            }
+            for (CheckerLocation loc : boardIn.getBlackPieceLocations()){
+                if (boardIn.getBoardPieces()[loc.xLocation][loc.yLocation].isKing()){
+                    enemyKings += Math.abs(loc.xLocation - loc.yLocation);
+                    enemyKingsNum++;
+                }
+            }
+        }
+        if (myKingsNum == 0 || enemyKingsNum == 0){
+            return 0;
+        } else {
+            myKings = 7 - (myKings / myKingsNum);
+            enemyKings = 7 - (enemyKings / enemyKingsNum);
+            return (myKings - enemyKings) * 16;
         }
     }
 }
