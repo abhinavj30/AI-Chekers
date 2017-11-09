@@ -25,7 +25,8 @@ class AI {
 
     private ArrayList<MoveOption> moveOptions;
 
-    private int heuristicCalc;
+    private long heuristicCalc;
+    private long boardsCalc;
 
     AI(int playerNum, int timeLimit) {
         this.playerNum = playerNum;
@@ -38,6 +39,7 @@ class AI {
         startTime = (new Date()).getTime();
 
         heuristicCalc = 0;
+        boardsCalc = 0;
 
         ArrayList<Move> moveList = new ArrayList<>();
         Board testBoard = new Board(gameBoard);
@@ -55,7 +57,7 @@ class AI {
         }
         Move returnMove = new Move();
         int depth;
-        for (depth = 6; depth < 9; depth++) {
+        for (depth = 6; depth < 15; depth++) {
             moveOptions = new ArrayList<>();
             System.gc();
             alphaBetaSearch(new Board(gameBoard), depth, Long.MIN_VALUE, Long.MAX_VALUE, true, true);
@@ -70,7 +72,8 @@ class AI {
         if (!timeOver) {
             System.out.println("Searched till depth " + depth + " in " + ((new Date()).getTime() - startTime) + " ms");
         }
-        System.out.println("Heuristic used: " + heuristicCalc);
+        System.out.println("Leaves viewed: " + heuristicCalc);
+        System.out.println("Nodes viewed: " + boardsCalc);
         if (returnMove.moveType == 0) {
             return null;
         }
@@ -161,6 +164,7 @@ class AI {
 
     private long alphaBetaSearch(Board boardIn, int depth, long alphaIn, long betaIn, boolean max, boolean isRoot) {
         if (!timeOver) {
+            boardsCalc++;
             if ((new Date()).getTime() - startTime > timeLimit * 1000) {
                 timeOver = true;
                 return 0;
@@ -179,16 +183,16 @@ class AI {
                 return calculateHeuristic(boardIn);
             }
             if (max) {
-                long branchValue = Long.MIN_VALUE;
+                long parentValue = Long.MIN_VALUE;
                 for (Move move : moves) {
                     Board board = new Board(boardIn);
                     board.pieceMover(move, false);
                     long childValue = alphaBetaSearch(board, depth - 1, alpha, beta, false, false);
-                    if (childValue > branchValue) {
-                        branchValue = childValue;
+                    if (childValue > parentValue) {
+                        parentValue = childValue;
                     }
-                    if (branchValue > alpha) {
-                        alpha = branchValue;
+                    if (parentValue > alpha) {
+                        alpha = parentValue;
                     }
                     if (isRoot){
                         moveOptions.add(new MoveOption(move, childValue));
@@ -197,24 +201,24 @@ class AI {
                         break;
                     }
                 }
-                return branchValue;
+                return parentValue;
             } else {
-                long branchValue = Long.MAX_VALUE;
+                long parentValue = Long.MAX_VALUE;
                 for (Move move : moves) {
                     Board board = new Board(boardIn);
                     board.pieceMover(move, false);
                     long childValue = alphaBetaSearch(board, depth - 1, alpha, beta, true, false);
-                    if (childValue < branchValue) {
-                        branchValue = childValue;
+                    if (childValue < parentValue) {
+                        parentValue = childValue;
                     }
-                    if (branchValue < beta) {
-                        beta = branchValue;
+                    if (parentValue < beta) {
+                        beta = parentValue;
                     }
                     if (beta <= alpha) {
                         break;
                     }
                 }
-                return branchValue;
+                return parentValue;
             }
         }
         return 0;
