@@ -6,8 +6,6 @@ import javax.swing.*;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.lang.management.BufferPoolMXBean;
-import java.util.ArrayList;
 
 /**
  * Created by abhinav on 10/19/2017.
@@ -88,17 +86,12 @@ public class RunGame extends JFrame {
                     }
                     iLoc++;
                 }
-                System.out.println("AI Time: " + aiTime);
-                System.out.println("Loaded player num: " + currentPlayer);
-
-
-                for (int i = 0; i < 8; i++) {
-                    System.out.println();
-                    for (int j = 0; j < 8; j++) {
-                        int kingVal = (boardLoaded.getBoardPieces()[i][j].isKing()) ? 2 : 0;
-                        System.out.print((boardLoaded.getBoardPieces()[i][j].getPieceColor() + kingVal) + " ");
-                    }
+                System.out.println("Loaded file.");
+                if (playerConfig != 3) {
+                    System.out.println("New AI time: " + aiTime);
                 }
+                System.out.println("Current player loaded: " + (currentPlayer == 1 ? "Black" : "Red"));
+
             } catch (IOException e) {
                 System.out.println("Could not open file \"" + fileLocation + "\". Loading default board layout...");
                 boardLoaded.initializeBoard();

@@ -25,9 +25,6 @@ class AI {
 
     private int currDepth = 0;
 
-    private long heuristicCalc;
-    private long boardsCalc;
-
     private Move chosenMove;
 
     AI(int playerNum, int timeLimit) {
@@ -40,9 +37,6 @@ class AI {
         System.out.println("AI making move...");
         startTime = (new Date()).getTime();
 
-        heuristicCalc = 0;
-        boardsCalc = 0;
-
         ArrayList<Move> moveList = new ArrayList<>();
         Board testBoard = new Board(gameBoard);
 
@@ -52,12 +46,6 @@ class AI {
             System.out.println("Error...");
             System.err.println(e.getMessage());
         }
-
-//        System.out.println("Moves from AI");
-//
-//        for (Move move: moveList){
-//            System.out.println(move);
-//        }
 
         if (moveList.size() == 1) {
             System.out.println("AI making default move");
@@ -173,7 +161,6 @@ class AI {
 
     private long alphaBetaSearch(Board boardIn, int depth, long alphaIn, long betaIn, boolean max, boolean isRoot) {
         if (!timeOver) {
-            boardsCalc++;
             if ((new Date()).getTime() - startTime > timeLimit * 1000) {
                 timeOver = true;
                 return 0;
@@ -255,11 +242,10 @@ class AI {
             }
         }
         long numPieces = numPiecesValue(boardIn, playerNum);
-        long avgToKing = (kingDistance(boardIn, (playerNum % 2) + 1) - kingDistance(boardIn, playerNum) + 7) * 99 / 7;
+        long avgToKing = (kingDistance(boardIn, (playerNum % 2) + 1) - kingDistance(boardIn, playerNum)) * 99 / 7;
         long piecesLeft = piecesLeftWeight(boardIn, playerNum);
         long kingLoc = kingLocation(boardIn, playerNum);
         long randomSafety = (new Random()).nextInt(9);
-        heuristicCalc++;
         return (numPieces * 10000000) + (avgToKing * 100000) + (piecesLeft * 1000) + (kingLoc * 10) + (randomSafety);
     }
 
