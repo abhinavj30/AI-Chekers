@@ -1,5 +1,7 @@
 package client;
 
+import com.sun.org.apache.regexp.internal.RE;
+
 import java.util.ArrayList;
 
 
@@ -59,7 +61,7 @@ public class Board {
                 boardPieces[i][j] = new Checker();
             }
         }
-        //this.initBoard3();
+        //this.initBoard4();
         this.initializeBoard();
 
         for (int i = 0; i < 8; i++) {
@@ -71,7 +73,7 @@ public class Board {
         }
     }
 
-    public Board(Board inBoard) {
+    Board(Board inBoard) {
         boardPieces = new Checker[8][8];
         this.blackPieceLocations = new ArrayList<>();
         this.redPieceLocations = new ArrayList<>();
@@ -141,6 +143,32 @@ public class Board {
         boardPieces[7][2].setPieceColor(BLACK);
         boardPieces[7][2].makeKing();
         blackPieceLocations.add(new CheckerLocation(7, 2));
+    }
+
+    private void initBoard4(){
+        blackPieceLocations = new ArrayList<>();
+        redPieceLocations = new ArrayList<>();
+
+        addPiece(2, 1, 0, false);
+        addPiece(2, 2, 3, true);
+        addPiece(1, 4, 1, false);
+        addPiece(2, 4, 5, false);
+        addPiece(2, 6, 3, false);
+        addPiece(2, 6, 5, false);
+        addPiece(2, 7, 4, false);
+    }
+
+    private void addPiece(int colour, int x, int y, boolean king){
+        if (colour == BLACK){
+            blackPieceLocations.add(new CheckerLocation(x, y));
+            boardPieces[x][y].setPieceColor(BLACK);
+        } else {
+            redPieceLocations.add(new CheckerLocation(x, y));
+            boardPieces[x][y].setPieceColor(RED);
+        }
+        if (king){
+            boardPieces[x][y].makeKing();
+        }
     }
 
     public Move checkMove(int direction, int iOrig, int jOrig, int playerNum, boolean king, boolean postKill) {

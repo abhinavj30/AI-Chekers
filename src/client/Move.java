@@ -68,4 +68,15 @@ public class Move {
         moveType = NO_MOVE;
         jumps = new ArrayList<>();
     }
+
+    @Override
+    public String toString(){
+        StringBuilder retString = new StringBuilder();
+        retString.append("move: ");
+        retString.append(xSource + "," + ySource + " -");
+        for (CheckerLocation loc : jumps){
+            retString.append("- " + loc.xLocation + "," + loc.yLocation + " ");
+        }
+        return retString.toString();
+    }
 }

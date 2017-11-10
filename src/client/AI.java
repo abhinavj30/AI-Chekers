@@ -23,10 +23,12 @@ class AI {
 
     private final long timeLimit;
 
-    private ArrayList<MoveOption> moveOptions;
+    private int currDepth = 0;
 
     private long heuristicCalc;
     private long boardsCalc;
+
+    private Move chosenMove;
 
     AI(int playerNum, int timeLimit) {
         this.playerNum = playerNum;
@@ -51,6 +53,12 @@ class AI {
             System.err.println(e.getMessage());
         }
 
+//        System.out.println("Moves from AI");
+//
+//        for (Move move: moveList){
+//            System.out.println(move);
+//        }
+
         if (moveList.size() == 1) {
             System.out.println("AI making default move");
             return moveList.get(0);
@@ -58,7 +66,8 @@ class AI {
         Move returnMove = new Move();
         int depth;
         for (depth = 6; depth < 15; depth++) {
-            moveOptions = new ArrayList<>();
+            currDepth = depth;
+            chosenMove = new Move();
             System.gc();
             alphaBetaSearch(new Board(gameBoard), depth, Long.MIN_VALUE, Long.MAX_VALUE, true, true);
             if (timeOver) {
@@ -66,14 +75,14 @@ class AI {
                 break;
             }
             if (!timeOver) {
-                returnMove = new Move(pickMove(moveOptions));
+                returnMove = new Move(chosenMove);
             }
         }
         if (!timeOver) {
             System.out.println("Searched till depth " + depth + " in " + ((new Date()).getTime() - startTime) + " ms");
         }
-        System.out.println("Leaves viewed: " + heuristicCalc);
-        System.out.println("Nodes viewed: " + boardsCalc);
+//        System.out.println("Leaves viewed: " + heuristicCalc);
+//        System.out.println("Nodes viewed: " + boardsCalc);
         if (returnMove.moveType == 0) {
             return null;
         }
@@ -176,11 +185,18 @@ class AI {
             if (max) {
                 checkValidMoves(moves, boardIn, playerNum);
             } else {
-                checkValidMoves(moves, boardIn, (playerNum % 2) + 1);
+                if (playerNum == BLACK){
+                    checkValidMoves(moves, boardIn, RED);
+                } else {
+                    checkValidMoves(moves, boardIn, BLACK);
+                }
             }
 
             if (moves.size() == 0 || depth == 0) {
-                return calculateHeuristic(boardIn);
+                long heuristic = calculateHeuristic(boardIn, depth);
+                //System.out.println("Heuristic = " + heuristic);
+                //return calculateHeuristic(boardIn);
+                return heuristic;
             }
             if (max) {
                 long parentValue = Long.MIN_VALUE;
@@ -190,12 +206,12 @@ class AI {
                     long childValue = alphaBetaSearch(board, depth - 1, alpha, beta, false, false);
                     if (childValue > parentValue) {
                         parentValue = childValue;
+                        if (isRoot){
+                            chosenMove = new Move(move);
+                        }
                     }
                     if (parentValue > alpha) {
                         alpha = parentValue;
-                    }
-                    if (isRoot){
-                        moveOptions.add(new MoveOption(move, childValue));
                     }
                     if (beta <= alpha) {
                         break;
@@ -224,53 +240,88 @@ class AI {
         return 0;
     }
 
-    private long calculateHeuristic(Board boardIn) {
-        long numPieces = numPiecesValue(boardIn, playerNum) - numPiecesValue(boardIn, (playerNum % 2) + 1);
-        long avgToKing = (kingDistance(boardIn, (playerNum % 2) + 1) - kingDistance(boardIn, playerNum)) * 99 / 7;
+    private long calculateHeuristic(Board boardIn, int depthIn) {
+        if (playerNum == BLACK){
+            if (boardIn.getRedPieceLocations().size() == 0){
+                return Long.MAX_VALUE - 1 - ((currDepth - depthIn) * 10000) - (new Random()).nextInt(100);
+            } else if (boardIn.getBlackPieceLocations().size() == 0){
+                return Long.MIN_VALUE + 1 + ((currDepth - depthIn) * 10000) + (new Random()).nextInt(100);
+            }
+        } else {
+            if (boardIn.getBlackPieceLocations().size() == 0){
+                return Long.MAX_VALUE - 1 - ((currDepth - depthIn) * 10000) - (new Random()).nextInt(100);
+            } else if (boardIn.getRedPieceLocations().size() == 0){
+                return Long.MIN_VALUE + 1 + ((currDepth - depthIn) * 10000) + (new Random()).nextInt(100);
+            }
+        }
+        long numPieces = numPiecesValue(boardIn, playerNum);
+        long avgToKing = (kingDistance(boardIn, (playerNum % 2) + 1) - kingDistance(boardIn, playerNum) + 7) * 99 / 7;
         long piecesLeft = piecesLeftWeight(boardIn, playerNum);
         long kingLoc = kingLocation(boardIn, playerNum);
         long randomSafety = (new Random()).nextInt(9);
         heuristicCalc++;
         return (numPieces * 10000000) + (avgToKing * 100000) + (piecesLeft * 1000) + (kingLoc * 10) + (randomSafety);
-        //return (new Random()).nextInt(1000);
     }
 
     private long numPiecesValue(Board boardIn, int playerNum){
-        long retVal = 0;
+        int myPieces = 0;
+        int enemyPieces = 0;
         if (playerNum == BLACK){
             for (CheckerLocation loc : boardIn.getBlackPieceLocations()){
-                retVal += (boardIn.getBoardPieces()[loc.xLocation][loc.yLocation].isKing()) ? 5 : 3;
+                myPieces += (boardIn.getBoardPieces()[loc.xLocation][loc.yLocation].isKing()) ? 5 : 3;
+            }
+            for (CheckerLocation loc : boardIn.getRedPieceLocations()){
+                enemyPieces += (boardIn.getBoardPieces()[loc.xLocation][loc.yLocation].isKing()) ? 5 : 3;
             }
         } else {
             for (CheckerLocation loc : boardIn.getRedPieceLocations()){
-                retVal += (boardIn.getBoardPieces()[loc.xLocation][loc.yLocation].isKing()) ? 5 : 3;
+                myPieces += (boardIn.getBoardPieces()[loc.xLocation][loc.yLocation].isKing()) ? 5 : 3;
+            }
+            for (CheckerLocation loc : boardIn.getBlackPieceLocations()){
+                enemyPieces += (boardIn.getBoardPieces()[loc.xLocation][loc.yLocation].isKing()) ? 5 : 3;
             }
         }
-        return retVal;
+        return myPieces - enemyPieces;
     }
 
     private long kingDistance (Board boardIn, int playerNum){
-        long retVal = 0;
-        int numPawns = 0;
+        int myToKingVal = 0;
+        int enemyToKingVal = 0;
+        int numMyPawns = 0;
+        int numEnemyPawns = 0;
         if (playerNum == BLACK){
             for (CheckerLocation loc : boardIn.getBlackPieceLocations()){
                 if (!boardIn.getBoardPieces()[loc.xLocation][loc.yLocation].isKing()) {
-                    retVal += (7 - loc.xLocation);
-                    numPawns++;
+                    myToKingVal += (7 - loc.xLocation);
+                    numMyPawns++;
+                }
+            }
+            for (CheckerLocation loc : boardIn.getRedPieceLocations()){
+                if (!boardIn.getBoardPieces()[loc.xLocation][loc.yLocation].isKing()) {
+                    enemyToKingVal += (loc.xLocation);
+                    numEnemyPawns++;
                 }
             }
         } else {
             for (CheckerLocation loc : boardIn.getRedPieceLocations()){
                 if (!boardIn.getBoardPieces()[loc.xLocation][loc.yLocation].isKing()) {
-                    retVal += (loc.xLocation);
-                    numPawns++;
+                    myToKingVal += (loc.xLocation);
+                    numMyPawns++;
+                }
+            }
+            for (CheckerLocation loc : boardIn.getBlackPieceLocations()){
+                if (!boardIn.getBoardPieces()[loc.xLocation][loc.yLocation].isKing()) {
+                    enemyToKingVal += (7 - loc.xLocation);
+                    numEnemyPawns++;
                 }
             }
         }
-        if (numPawns == 0){
+        if (numMyPawns == 0){
             return 0;
+        } else if (numEnemyPawns == 0) {
+            return myToKingVal / numMyPawns;
         } else {
-            return retVal / numPawns;
+            return ((myToKingVal / numMyPawns) - (enemyToKingVal / numEnemyPawns)) * 99 / 7;
         }
     }
 

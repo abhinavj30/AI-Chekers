@@ -4,6 +4,8 @@ package client;
  * Created by abhinav on 10/19/2017.
  */
 
+import com.sun.corba.se.spi.ior.MakeImmutable;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -13,6 +15,7 @@ import java.awt.event.MouseListener;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.Scanner;
 
 public class CheckersGame extends JPanel implements ActionListener, MouseListener {
 
@@ -37,12 +40,13 @@ public class CheckersGame extends JPanel implements ActionListener, MouseListene
     private static JFrame frame;
     private static CheckerLocation selectedBlock;
     private static ArrayList<Move> selectedMoves;
-    private static Move selectedMove;
     private static int currentPlayer;
 
     private final boolean blackIsAI;
     private final boolean redIsAI;
     private final int aiTime;
+
+    private String[] playerNames = {"None", "Black", "Red"};
 
     private AI blackAI;
     private AI redAI;
@@ -69,8 +73,8 @@ public class CheckersGame extends JPanel implements ActionListener, MouseListene
             redAI = new AI(RED, aiTime);
         }
 
-        currentPlayer = RED;
-        //currentPlayer = BLACK;
+        //currentPlayer = RED;
+        currentPlayer = BLACK;
 
         System.out.println();
         selectedBlock = new CheckerLocation(-1, -1);
@@ -78,13 +82,13 @@ public class CheckersGame extends JPanel implements ActionListener, MouseListene
         updateBoard();
         printValidMoves();
 
-        if (redIsAI){
-            makeMove(redAI.aiMove());
-        }
-
-        //if (blackIsAI){
-        //    makeMove(blackAI.aiMove());
+        //if (redIsAI){
+        //    makeMove(redAI.aiMove());
         //}
+
+        if (blackIsAI){
+            makeMove(blackAI.aiMove());
+        }
     }
 
     private void setupWindow() {
@@ -100,7 +104,6 @@ public class CheckersGame extends JPanel implements ActionListener, MouseListene
     }
 
     private void checkValidMoves(ArrayList<Move> moveList, Board boardIn, int player) {
-        System.out.println("Checking valid moves...");
         boolean killAvailable = false;
         ArrayList<CheckerLocation> currentCheckers = new ArrayList<>();
         if (player == BLACK) {
@@ -159,13 +162,14 @@ public class CheckersGame extends JPanel implements ActionListener, MouseListene
     }
 
     private void makeMove(Move move) {
+        System.out.println("Player " + playerNames[currentPlayer] + " picked the following " + move);
         gameBoard.pieceMover(move, false);
         blackScore = gameBoard.getBlackPieceLocations().size();
         redScore = gameBoard.getRedPieceLocations().size();
         System.out.println("Score: Black - " + blackScore + ", Red - " + redScore);
         if (redScore * blackScore == 0) {
-            System.out.println("Game Over");
-            JOptionPane.showMessageDialog(null, "Game Over", "Game Over", JOptionPane.INFORMATION_MESSAGE);
+            System.out.println("Game Over! Player " + (redScore == 0 ? "Black" : "Red") + " won!");
+            JOptionPane.showMessageDialog(null, "Game Over! Player " + (redScore == 0 ? "Black" : "Red") + " won!", "Game Over", JOptionPane.INFORMATION_MESSAGE);
             System.exit(0);
         }
         changePlayer();
@@ -247,7 +251,7 @@ public class CheckersGame extends JPanel implements ActionListener, MouseListene
         }
         for (CheckerLocation loc : gameBoard.getBlackPieceLocations()) {
             if (gameBoard.getBoardPieces()[loc.xLocation][loc.yLocation].isKing()) {
-                drawChecker(loc.yLocation, loc.xLocation, g, Color.darkGray);
+                drawChecker(loc.yLocation, loc.xLocation, g, Color.lightGray);
             } else {
                 drawChecker(loc.yLocation, loc.xLocation, g, Color.black);
             }
@@ -280,24 +284,29 @@ public class CheckersGame extends JPanel implements ActionListener, MouseListene
     public void mousePressed(MouseEvent e) {
         CheckerLocation clickedLocation = new CheckerLocation((e.getY() - 30) / 90, (e.getX() - 8) / 90);
         if ((currentPlayer == BLACK && !blackIsAI) || (currentPlayer == RED && !redIsAI)) {
-            for (Move move : selectedMoves) {
-                CheckerLocation dest = move.jumps.get(move.jumps.size() - 1);
-                if (dest.equals(clickedLocation) && move.xSource == selectedBlock.xLocation && move.ySource == selectedBlock.yLocation) {
-                    if (checkSameInitEnd()){
-                        System.out.println("Multiple moves terminated here. Please select a move by selecting a route block.");
-                    } else {
-                        makeMove(move);
-                        updateBoard();
-                        return;
+            if (selectedMoves.size() != 0){
+                if (checkSameInitEnd(clickedLocation)){
+                    System.out.println("Multiple moves...");
+                    String[] moveOptions = new String[selectedMoves.size()];
+                    for (int i = 0; i < selectedMoves.size(); i++) {
+                        moveOptions[i] = selectedMoves.get(i).toString();
                     }
-                }
-                if (move.jumps.contains(clickedLocation) && checkSameInitEnd()){
-                    if (checkSameRoute(clickedLocation)){
-                        System.out.println("This location is in multiple moves. Please select a different move.");
-                    } else {
-                        makeMove(move);
-                        updateBoard();
-                        return;
+                    String selectedMoveString = moveSelection(moveOptions);
+                    for (int i = 0; i < selectedMoves.size(); i++){
+                        if (moveOptions[i].equals(selectedMoveString)){
+                            makeMove(selectedMoves.get(i));
+                            updateBoard();
+                            return;
+                        }
+                    }
+                } else {
+                    for (Move move : selectedMoves) {
+                        CheckerLocation dest = move.jumps.get(move.jumps.size() - 1);
+                        if (dest.equals(clickedLocation)){
+                            makeMove(move);
+                            updateBoard();
+                            return;
+                        }
                     }
                 }
             }
@@ -314,41 +323,22 @@ public class CheckersGame extends JPanel implements ActionListener, MouseListene
         }
     }
 
-    private boolean checkSameInitEnd(){
+    private boolean checkSameInitEnd(CheckerLocation dest){
+        int numMoves = 0;
         for (Move move : selectedMoves){
-            for (Move move1 : selectedMoves){
-                if (!move.equals(move1)) {
-                    if (move.moveType == MOVE_KILL) {
-                        if (move.jumps.get(move.jumps.size() - 1).equals(move1.jumps.get(move.jumps.size() - 1))) {
-                            return true;
-                        }
-                    }
-                }
+            if (move.jumps.get(move.jumps.size() - 1).equals(dest)){
+                numMoves++;
             }
         }
-        return false;
+        if (numMoves > 1){
+            return true;
+        } else {
+            return false;
+        }
     }
 
-    private boolean checkSameRoute(CheckerLocation location){
-        boolean retVal = true;
-        if (checkSameInitEnd()){
-            for (Move move : selectedMoves){
-                for (Move move1 : selectedMoves){
-                    if (!move.equals(move1)) {
-                        if (move.moveType == MOVE_KILL) {
-                            if (move.jumps.get(move.jumps.size() - 1).equals(move1.jumps.get(move.jumps.size() - 1))) {
-                                if ((move.jumps.contains(location) && !move1.jumps.contains(location)) || (!move.jumps.contains(location) && move1.jumps.contains(location))) {
-                                    retVal = false;
-                                } else if (move.jumps.contains(location) && move1.jumps.contains(location)){
-                                    retVal = true;
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        return retVal;
+    private String moveSelection (String[] movesIn) {
+        return (String)JOptionPane.showInputDialog(null, "Multiple moves for the selected piece terminate here. Please select one.", "Select a move", JOptionPane.INFORMATION_MESSAGE, null, movesIn, movesIn[0]);
     }
 
     @Override
