@@ -61,16 +61,8 @@ public class Board {
                 boardPieces[i][j] = new Checker();
             }
         }
-        //this.initBoard4();
-        this.initializeBoard();
-
-        for (int i = 0; i < 8; i++) {
-            System.out.println();
-            for (int j = 0; j < 8; j++) {
-                int kingVal = (boardPieces[i][j].isKing()) ? 2 : 0;
-                System.out.print((boardPieces[i][j].getPieceColor() + kingVal) + " ");
-            }
-        }
+        blackPieceLocations = new ArrayList<>();
+        redPieceLocations = new ArrayList<>();
     }
 
     Board(Board inBoard) {
@@ -92,7 +84,7 @@ public class Board {
         }
     }
 
-    private void initializeBoard() {
+    void initializeBoard() {
 
         blackPieceLocations = new ArrayList<>();
         redPieceLocations = new ArrayList<>();
@@ -158,7 +150,33 @@ public class Board {
         addPiece(2, 7, 4, false);
     }
 
-    private void addPiece(int colour, int x, int y, boolean king){
+    private void initBoard5() {
+        blackPieceLocations = new ArrayList<>();
+        redPieceLocations = new ArrayList<>();
+
+        addPiece(1, 4, 3, true);
+        //addPiece(2, 5, 2);
+        addPiece(2, 3, 2);
+        addPiece(2, 1, 2);
+        addPiece(2, 1, 4);
+        //addPiece(2, 1, 6);
+        addPiece(2, 3, 6);
+        addPiece(2, 5, 6);
+        addPiece(2, 5, 4);
+
+    }
+
+    void addPiece(int colour, int x, int y){
+        if (colour == BLACK){
+            blackPieceLocations.add(new CheckerLocation(x, y));
+            boardPieces[x][y].setPieceColor(BLACK);
+        } else {
+            redPieceLocations.add(new CheckerLocation(x, y));
+            boardPieces[x][y].setPieceColor(RED);
+        }
+    }
+
+    void addPiece(int colour, int x, int y, boolean king){
         if (colour == BLACK){
             blackPieceLocations.add(new CheckerLocation(x, y));
             boardPieces[x][y].setPieceColor(BLACK);

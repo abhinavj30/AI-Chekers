@@ -42,21 +42,30 @@ public class CheckersGame extends JPanel implements ActionListener, MouseListene
     private static ArrayList<Move> selectedMoves;
     private static int currentPlayer;
 
+    private ArrayList<CheckerLocation> killDestinations;
+
     private final boolean blackIsAI;
     private final boolean redIsAI;
     private final int aiTime;
+
+    private boolean killAvailable;
 
     private String[] playerNames = {"None", "Black", "Red"};
 
     private AI blackAI;
     private AI redAI;
 
-    CheckersGame(boolean oneIsAI, boolean twoIsAI, int aiTime) {
+    CheckersGame(boolean oneIsAI, boolean twoIsAI, int aiTime, Board boardLoaded, int currentPlayerLoaded) {
         blackIsAI = oneIsAI;
         redIsAI = twoIsAI;
         this.aiTime = aiTime;
 
-        gameBoard = new Board();
+        if (boardLoaded != null) {
+            gameBoard = new Board(boardLoaded);
+        } else {
+            gameBoard = new Board();
+        }
+        currentPlayer = currentPlayerLoaded;
         selectedMoves = new ArrayList<>();
         setupWindow();
         startGame();
@@ -73,18 +82,17 @@ public class CheckersGame extends JPanel implements ActionListener, MouseListene
             redAI = new AI(RED, aiTime);
         }
 
-        //currentPlayer = RED;
-        currentPlayer = BLACK;
-
         System.out.println();
         selectedBlock = new CheckerLocation(-1, -1);
 
         updateBoard();
         printValidMoves();
 
-        //if (redIsAI){
-        //    makeMove(redAI.aiMove());
-        //}
+        if (currentPlayer == RED && redIsAI){
+            makeMove(redAI.aiMove());
+        } else if (currentPlayer == BLACK && blackIsAI){
+            makeMove(blackAI.aiMove());
+        }
 
         if (blackIsAI){
             makeMove(blackAI.aiMove());
@@ -104,7 +112,7 @@ public class CheckersGame extends JPanel implements ActionListener, MouseListene
     }
 
     private void checkValidMoves(ArrayList<Move> moveList, Board boardIn, int player) {
-        boolean killAvailable = false;
+        killAvailable = false;
         ArrayList<CheckerLocation> currentCheckers = new ArrayList<>();
         if (player == BLACK) {
             currentCheckers = boardIn.getBlackPieceLocations();
@@ -120,7 +128,6 @@ public class CheckersGame extends JPanel implements ActionListener, MouseListene
             }
         }
         if (killAvailable) {
-            System.out.println("Kill available...");
             Iterator<Move> iter = moveList.iterator();
             while (iter.hasNext()) {
                 Move move = iter.next();
@@ -213,7 +220,10 @@ public class CheckersGame extends JPanel implements ActionListener, MouseListene
     private void printValidMoves() {
         System.out.println("Valid moves for current player " + currentPlayer);
         for (Move move : validMoves){
-            printMove(move);
+            System.out.println(move.toString());
+        }
+        if (killAvailable){
+            System.out.println("Jump available...");
         }
     }
 
@@ -241,12 +251,17 @@ public class CheckersGame extends JPanel implements ActionListener, MouseListene
                         g.setColor(Color.green);
                     } else {
                         g.setColor(Color.pink);
-                        if (move.jumps.indexOf(loc) == move.jumps.size() - 1) {
-                            g.setColor(Color.red);
-                        }
                     }
                     g.fillRect(loc.yLocation * 720 / 8, loc.xLocation * 720 / 8, 720 / 8, 720 / 8);
                 }
+            }
+            for (CheckerLocation loc : killDestinations){
+                if (loc.equals(selectedBlock)){
+                    g.setColor(new Color(160, 32, 240));
+                } else {
+                    g.setColor(Color.red);
+                }
+                g.fillRect(loc.yLocation * 720 / 8, loc.xLocation * 720 / 8, 720 / 8, 720 / 8);
             }
         }
         for (CheckerLocation loc : gameBoard.getBlackPieceLocations()) {
@@ -286,15 +301,21 @@ public class CheckersGame extends JPanel implements ActionListener, MouseListene
         if ((currentPlayer == BLACK && !blackIsAI) || (currentPlayer == RED && !redIsAI)) {
             if (selectedMoves.size() != 0){
                 if (checkSameInitEnd(clickedLocation)){
+                    ArrayList<Move> selectionList = new ArrayList<>();
+                    for (Move move : selectedMoves){
+                        if (move.jumps.get(move.jumps.size() - 1).equals(clickedLocation)){
+                            selectionList.add(move);
+                        }
+                    }
                     System.out.println("Multiple moves...");
-                    String[] moveOptions = new String[selectedMoves.size()];
-                    for (int i = 0; i < selectedMoves.size(); i++) {
-                        moveOptions[i] = selectedMoves.get(i).toString();
+                    String[] moveOptions = new String[selectionList.size()];
+                    for (int i = 0; i < selectionList.size(); i++) {
+                        moveOptions[i] = selectionList.get(i).toString();
                     }
                     String selectedMoveString = moveSelection(moveOptions);
-                    for (int i = 0; i < selectedMoves.size(); i++){
+                    for (int i = 0; i < selectionList.size(); i++){
                         if (moveOptions[i].equals(selectedMoveString)){
-                            makeMove(selectedMoves.get(i));
+                            makeMove(selectionList.get(i));
                             updateBoard();
                             return;
                         }
@@ -313,9 +334,13 @@ public class CheckersGame extends JPanel implements ActionListener, MouseListene
             if (gameBoard.getBoardPieces()[clickedLocation.xLocation][clickedLocation.yLocation].getPieceColor() == currentPlayer) {
                 selectedBlock = new CheckerLocation(clickedLocation);
                 selectedMoves = new ArrayList<>();
+                killDestinations = new ArrayList<>();
                 for (Move move: validMoves){
                     if (move.xSource == selectedBlock.xLocation && move.ySource == selectedBlock.yLocation){
                         selectedMoves.add(move);
+                        if (move.moveType == MOVE_KILL){
+                            killDestinations.add(new CheckerLocation(move.jumps.get(move.jumps.size() - 1)));
+                        }
                     }
                 }
             }
